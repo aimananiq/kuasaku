@@ -39,7 +39,7 @@ const PILLARS: { icon: LucideIcon; title: string; body: string }[] = [
   {
     icon: Server,
     title: 'Self-host or hosted',
-    body: 'Run OpenKuasa on infrastructure you control for free, or pay for the hosted version once it launches. It is the same software either way.',
+    body: 'Run KuasabyRickworks on infrastructure you control for free, or pay for the hosted version once it launches. It is the same software either way.',
   },
   {
     icon: Database,
@@ -69,7 +69,7 @@ const STEPS = [
 const FAQS = [
   {
     q: 'Is it really free?',
-    a: 'Yes. OpenKuasa is free software under the AGPL-3.0 license. If you host it yourself there are no plans, no credits and nothing to subscribe to.',
+    a: 'Yes. KuasabyRickworks is free software under the AGPL-3.0 license. If you host it yourself there are no plans, no credits and nothing to subscribe to.',
   },
   {
     q: 'What will I have to pay for?',
@@ -77,7 +77,7 @@ const FAQS = [
   },
   {
     q: 'Is there a hosted version?',
-    a: 'Not yet. A paid hosted version is planned for people who would rather not run it themselves. Pricing has not been announced, and today the only way to use OpenKuasa is to host it yourself.',
+    a: 'Not yet. A paid hosted version is planned for people who would rather not run it themselves. Pricing has not been announced, and today the only way to use KuasabyRickworks is to host it yourself.',
   },
   {
     q: 'Will it still be open source once there is a paid version?',
@@ -85,11 +85,11 @@ const FAQS = [
   },
   {
     q: 'Is it ready to run my business on?',
-    a: 'Not yet. OpenKuasa is a work in progress. Accounts, teams, AI chat and a first set of screens in Jebat and Kasturi work with your own data. The other screens still show sample data, and integrations are not connected. Each screen that is not ready says so.',
+    a: 'Not yet. KuasabyRickworks is a work in progress. Accounts, teams, AI chat and a first set of screens in Jebat and Kasturi work with your own data. The other screens still show sample data, and integrations are not connected. Each screen that is not ready says so.',
   },
   {
-    q: 'Who builds OpenKuasa?',
-    a: 'The OpenKuasa maintainers and volunteer contributors. It is a crowd-sourced project developed in the open, and it is not affiliated with any other company or product.',
+    q: 'Who builds KuasabyRickworks?',
+    a: 'The KuasabyRickworks maintainers and volunteer contributors. It is a crowd-sourced project developed in the open, and it is not affiliated with any other company or product.',
   },
   {
     q: 'Is there support?',
@@ -136,7 +136,7 @@ export default function PricingPage() {
             Free to self-host
           </h1>
           <p className="mt-6 max-w-xl text-lg text-mk-muted">
-            Run OpenKuasa on your own infrastructure at no cost. A paid hosted
+            Run KuasabyRickworks on your own infrastructure at no cost. A paid hosted
             version is on the way for teams who would rather not run it
             themselves.
           </p>
@@ -293,7 +293,7 @@ export default function PricingPage() {
           </ol>
 
           <p className="mx-auto mt-10 max-w-2xl text-center text-sm text-mk-muted">
-            OpenKuasa is a work in progress: some screens work with your own
+            KuasabyRickworks is a work in progress: some screens work with your own
             data and the rest still show sample data. It is provided as is,
             without warranty of any kind.
           </p>
@@ -357,7 +357,7 @@ export default function PricingPage() {
             Built in the open, by its community
           </h2>
           <p className="mt-5 text-lg text-mk-muted">
-            Run it, read it, improve it. OpenKuasa belongs to the people who
+            Run it, read it, improve it. KuasabyRickworks belongs to the people who
             build it.
           </p>
           <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">

@@ -47,6 +47,6 @@ Triggers enforce it, so no caller can get round it. A bill or an invoice is alwa
 
 ## Related
 
-- [How OpenKuasa is built](/docs/developers/architecture)
+- [How KuasabyRickworks is built](/docs/developers/architecture)
 - [Keep the database up to date](/docs/developers/database-migrations)
 - [CRM backend notes](/docs/developers/crm-backend)

@@ -30,7 +30,7 @@ All four switches start off.
 - **Full name** and **Email** are always required. **Phone** is optional.
 - **CV**: they can **Upload a PDF** (PDF, up to 5 MB) or paste a **Link to your CV**. It is required only when **Require a CV** is on.
 - **Cover letter**, **Portfolio link** and **Expected monthly salary**, when you turned them on.
-- A box they must tick to agree that your company may store and use their details to consider them for the role. It also says the details are processed through OpenKuasa and may be reviewed with the help of an AI assistant.
+- A box they must tick to agree that your company may store and use their details to consider them for the role. It also says the details are processed through KuasabyRickworks and may be reviewed with the help of an AI assistant.
 - **Send application**. After sending, they see a thank-you that says your company will be in touch if there's a match.
 
 ## Common problems

@@ -1,8 +1,8 @@
 ---
-title: How OpenKuasa is built
+title: How KuasabyRickworks is built
 description: The stack, the folders, how screens are routed, and how data is kept to its own workspace.
 order: 8
-ask: How is the OpenKuasa codebase organised?
+ask: How is the KuasabyRickworks codebase organised?
 ---
 A map of the codebase for anyone about to change it.
 
@@ -75,6 +75,6 @@ Nothing in the app imports `src/screens/registry.ts`: that would put every scree
 ## Related
 
 - [Add a screen](/docs/developers/add-a-screen)
-- [Contribute to OpenKuasa](/docs/developers/contributing)
+- [Contribute to KuasabyRickworks](/docs/developers/contributing)
 - [Finance backend notes](/docs/developers/finance-backend)
 - [CRM backend notes](/docs/developers/crm-backend)

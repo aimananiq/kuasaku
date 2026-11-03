@@ -1,14 +1,14 @@
 ---
 title: Add a screen
-description: Add a new screen to an OpenKuasa product, with its own route.
+description: Add a new screen to an KuasabyRickworks product, with its own route.
 order: 10
-ask: How do I add a new screen to an OpenKuasa product?
+ask: How do I add a new screen to an KuasabyRickworks product?
 ---
 Each screen has its own route, so a page loads only the scripts its own screen needs. Adding one takes four steps.
 
 ## Who can do this
 
-Anyone changing the code. A new screen is a bigger change: open an issue first. See [Contribute to OpenKuasa](/docs/developers/contributing).
+Anyone changing the code. A new screen is a bigger change: open an issue first. See [Contribute to KuasabyRickworks](/docs/developers/contributing).
 
 ## Steps
 
@@ -30,5 +30,5 @@ When the screen reads and writes the workspace's own data, add its key to `src/c
 
 ## Related
 
-- [How OpenKuasa is built](/docs/developers/architecture)
-- [Contribute to OpenKuasa](/docs/developers/contributing)
+- [How KuasabyRickworks is built](/docs/developers/architecture)
+- [Contribute to KuasabyRickworks](/docs/developers/contributing)

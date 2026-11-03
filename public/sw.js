@@ -1,5 +1,5 @@
 /*
- * OpenKuasa's service worker. Browsers need one before they offer "Install".
+ * KuasabyRickworks's service worker. Browsers need one before they offer "Install".
  *
  * It caches nothing: every request goes to the live site, as in a browser tab.
  * The only thing it adds is a plain "You're offline" page when a page can't load
@@ -20,7 +20,7 @@ self.addEventListener('activate', (event) => {
 
 const OFFLINE_PAGE = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Offline · OpenKuasa</title>
+<title>Offline · KuasabyRickworks</title>
 <style>
   body { margin: 0; min-height: 100vh; display: grid; place-items: center; font-family: system-ui, sans-serif; background: #fff; color: #1b1d1c; text-align: center; padding: 24px; box-sizing: border-box; }
   @media (prefers-color-scheme: dark) { body { background: #0f141a; color: #e8ecef; } p { color: #9aa4ad; } }
@@ -29,7 +29,7 @@ const OFFLINE_PAGE = `<!doctype html>
   p { margin: 0 0 20px; color: #5b605d; }
   a { display: inline-block; background: #007a55; color: #fff; text-decoration: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; }
 </style></head>
-<body><main><div class="mark"></div><h1>You're offline</h1><p>OpenKuasa needs an internet connection. Check yours and try again.</p><a href="">Try again</a></main></body></html>`;
+<body><main><div class="mark"></div><h1>You're offline</h1><p>KuasabyRickworks needs an internet connection. Check yours and try again.</p><a href="">Try again</a></main></body></html>`;
 
 /*
  * Push notifications. The server sends { title, body, url, tag }; each notification has its
@@ -59,7 +59,7 @@ self.addEventListener('push', (event) => {
   } catch {
     data = {};
   }
-  const title = typeof data.title === 'string' && data.title ? data.title : 'OpenKuasa';
+  const title = typeof data.title === 'string' && data.title ? data.title : 'KuasabyRickworks';
   const options = {
     body: typeof data.body === 'string' ? data.body : '',
     icon: PUSH_ICON,

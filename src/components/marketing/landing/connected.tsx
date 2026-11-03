@@ -232,11 +232,11 @@ export function Connected() {
         <div className="mx-auto mt-16 grid max-w-4xl gap-4 text-center sm:grid-cols-2 sm:text-left lg:mt-20">
           <div className="rounded-2xl border border-mk-border bg-mk-surface p-6 dark:bg-mk-fg/[0.03]">
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-mk-accent">
-              why OpenKuasa
+              why KuasabyRickworks
             </p>
             <p className="mt-2 text-mk-fg/70">
               <span className="font-semibold text-mk-fg">Kuasa</span> is Malay
-              for power. OpenKuasa puts the power to run a business in the
+              for power. KuasabyRickworks puts the power to run a business in the
               open: free software anyone can read, host and change.
             </p>
           </div>

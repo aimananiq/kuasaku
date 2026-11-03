@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description: (found?.page.available && found.page.subheadline) || null,
     robots: ROBOTS,
-    // Replaces the site-wide share text, which is about OpenKuasa, not this page.
+    // Replaces the site-wide share text, which is about KuasabyRickworks, not this page.
     openGraph: { title },
     twitter: { card: 'summary', title },
   };
@@ -119,7 +119,7 @@ export default async function PublicLandingPage({ params }: Props) {
           prefetch={false}
           className="rounded-sm underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          Powered by OpenKuasa
+          Powered by KuasabyRickworks
         </Link>
       </footer>
       {chatbot ? (

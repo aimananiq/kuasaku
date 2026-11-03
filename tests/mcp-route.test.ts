@@ -279,14 +279,14 @@ describe('/api/mcp', () => {
   });
 
   test('unauthenticated gives 401 with resource_metadata', async () => {
-    mocks.resolveCaller.mockResolvedValue({ ok: false, status: 401, message: 'Sign in to OpenKuasa or use an API key.' });
+    mocks.resolveCaller.mockResolvedValue({ ok: false, status: 401, message: 'Sign in to KuasabyRickworks or use an API key.' });
     const response = await POST(rpc('tools/list', undefined, { authorization: '' }));
     expect(response.status).toBe(401);
     expect(response.headers.get('www-authenticate')).toBe(
       'Bearer resource_metadata="https://openkuasa.com/.well-known/oauth-protected-resource"',
     );
     const body = (await response.json()) as { error?: { message?: string } };
-    expect(body.error?.message).toBe('Sign in to OpenKuasa or use an API key.');
+    expect(body.error?.message).toBe('Sign in to KuasabyRickworks or use an API key.');
   });
 
   test('with sign-in switched off, the refusal of a sign-in token is still a 401 with resource_metadata', async () => {
@@ -304,18 +304,18 @@ describe('/api/mcp', () => {
 
   test('403 and 503 pass through with their message and no token', async () => {
     for (const status of [403, 503] as const) {
-      mocks.resolveCaller.mockResolvedValue({ ok: false, status, message: 'Switch back to Rimba in OpenKuasa.' });
+      mocks.resolveCaller.mockResolvedValue({ ok: false, status, message: 'Switch back to Rimba in KuasabyRickworks.' });
       const response = await POST(rpc('tools/list'));
       expect(response.status).toBe(status);
       expect(response.headers.get('www-authenticate')).toBeNull();
       const text = await response.text();
-      expect(JSON.parse(text).error.message).toBe('Switch back to Rimba in OpenKuasa.');
+      expect(JSON.parse(text).error.message).toBe('Switch back to Rimba in KuasabyRickworks.');
       expect(text).not.toContain(KEY);
     }
   });
 
   test('an unauthenticated request never has its body read', async () => {
-    mocks.resolveCaller.mockResolvedValue({ ok: false, status: 401, message: 'Sign in to OpenKuasa or use an API key.' });
+    mocks.resolveCaller.mockResolvedValue({ ok: false, status: 401, message: 'Sign in to KuasabyRickworks or use an API key.' });
     const request = rpc('tools/list');
     await POST(request);
     expect(request.bodyUsed).toBe(false);
@@ -344,7 +344,7 @@ describe('/api/mcp', () => {
   });
 
   test('DELETE goes through the caller check', async () => {
-    mocks.resolveCaller.mockResolvedValue({ ok: false, status: 401, message: 'Sign in to OpenKuasa or use an API key.' });
+    mocks.resolveCaller.mockResolvedValue({ ok: false, status: 401, message: 'Sign in to KuasabyRickworks or use an API key.' });
     const response = await DELETE(new Request('https://openkuasa.com/api/mcp', { method: 'DELETE' }));
     expect(response.status).toBe(401);
   });

@@ -2,10 +2,10 @@
 title: Connect an AI tool (MCP)
 description: Make an API key and connect Claude Code, Cursor, Codex or another MCP app to your workspace.
 order: 5
-ask: How do I connect Claude Code or Cursor to OpenKuasa with an API key?
+ask: How do I connect Claude Code or Cursor to KuasabyRickworks with an API key?
 screen: /account/developers
 ---
-OpenKuasa has an MCP server, so an AI tool on your computer can look things up and make changes in your workspace. The tool acts as you, with exactly what you can see and do in the app.
+KuasabyRickworks has an MCP server, so an AI tool on your computer can look things up and make changes in your workspace. The tool acts as you, with exactly what you can see and do in the app.
 
 ## Who can do this
 
@@ -70,7 +70,7 @@ bearer_token_env_var = "OPENKUASA_API_KEY"
 
 On your own copy, use your own server address in place of `https://openkuasa.com/api/mcp`.
 
-**Claude Desktop and claude.ai** connect without a key, by signing in. This works only when the site has "Sign in with OpenKuasa" turned on; otherwise the **Set up** card says **Coming soon**. See [Turn on Sign in with OpenKuasa](/docs/developers/mcp-sign-in).
+**Claude Desktop and claude.ai** connect without a key, by signing in. This works only when the site has "Sign in with KuasabyRickworks" turned on; otherwise the **Set up** card says **Coming soon**. See [Turn on Sign in with KuasabyRickworks](/docs/developers/mcp-sign-in).
 
 ### 4. Try it
 
@@ -102,12 +102,12 @@ The tool that used it can no longer connect.
 - **"That code did not work. Check your authenticator app and try again."** The code was wrong or expired.
 - **"The demo workspace is read-only. Sign up to make API keys."** You are in the demo workspace, which shows this in place of the form for making a key.
 - **"Two-step sign-in was turned on after this key was made. Make a new key in Account → Developers."** Make a new key, with your authenticator code.
-- **"That API key or sign-in is not valid any more. Sign in to OpenKuasa again, or make a new API key."** The key was revoked or is wrong. Make a new one.
+- **"That API key or sign-in is not valid any more. Sign in to KuasabyRickworks again, or make a new API key."** The key was revoked or is wrong. Make a new one.
 - **"You are no longer a member of this workspace, so this connection cannot act in it."** You were removed from the workspace the key belongs to.
-- **The tool is told to switch back to a workspace.** A key works only in its own workspace. If you now have another workspace open in OpenKuasa, the server refuses rather than acting there. Switch back in OpenKuasa, or make a key in the other workspace.
+- **The tool is told to switch back to a workspace.** A key works only in its own workspace. If you now have another workspace open in KuasabyRickworks, the server refuses rather than acting there. Switch back in KuasabyRickworks, or make a key in the other workspace.
 - **"Too many requests just now. Wait a minute and try again."** or **"Too many calls just now. Wait a minute and try again."** Each key may send up to 120 requests a minute, and run up to 60 tool calls a minute, of which at most 10 changes.
 
 ## Related
 
-- [Turn on Sign in with OpenKuasa](/docs/developers/mcp-sign-in)
+- [Turn on Sign in with KuasabyRickworks](/docs/developers/mcp-sign-in)
 - [Environment variables](/docs/developers/environment-variables)

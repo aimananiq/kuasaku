@@ -27,7 +27,7 @@ const isIos = (userAgent: string, maxTouchPoints: number) =>
 
 /**
  * Whether this device can turn push on. No server key wins over everything else; an
- * iPhone or iPad only gets push once OpenKuasa is on its Home Screen (in a Safari tab
+ * iPhone or iPad only gets push once KuasabyRickworks is on its Home Screen (in a Safari tab
  * there is no push at all, so this is checked before the browser features).
  */
 export function pushSupport(env: PushEnv): PushSupport {
@@ -207,7 +207,7 @@ export async function subscribeThisDevice(publicKey: string): Promise<PushResult
   } catch {
     // No answer at all: don't leave a subscription the server never heard of.
     if (created) await sub.unsubscribe().catch(() => false);
-    return { ok: false, error: "Couldn't reach OpenKuasa. Check your connection and try again." };
+    return { ok: false, error: "Couldn't reach KuasabyRickworks. Check your connection and try again." };
   }
   if (res.ok) return { ok: true };
 

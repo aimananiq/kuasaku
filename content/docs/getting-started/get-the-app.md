@@ -1,10 +1,10 @@
 ---
 title: Get the app
-description: Put OpenKuasa on your phone or computer, with its own icon and window.
+description: Put KuasabyRickworks on your phone or computer, with its own icon and window.
 order: 13
-ask: How do I install OpenKuasa as an app?
+ask: How do I install KuasabyRickworks as an app?
 ---
-You can install OpenKuasa from the website. It opens in its own window with its own icon. You do not need an app store or a download.
+You can install KuasabyRickworks from the website. It opens in its own window with its own icon. You do not need an app store or a download.
 
 ## Who can do this
 
@@ -12,7 +12,7 @@ Anyone, signed in or not.
 
 ## Steps
 
-Look for **Get the app**. It is in the header and footer of the OpenKuasa website, and in your account menu once you are signed in. It is hidden inside the installed app, because you already have it.
+Look for **Get the app**. It is in the header and footer of the KuasabyRickworks website, and in your account menu once you are signed in. It is hidden inside the installed app, because you already have it.
 
 ### If your browser shows an install prompt
 
@@ -25,7 +25,7 @@ Some browsers do not offer a prompt. Then **Get the app** shows the steps for yo
 **Chrome on a computer**
 
 1. Click the three dots at the top right of Chrome.
-2. Choose **Cast, save, and share**, then **Install OpenKuasa**.
+2. Choose **Cast, save, and share**, then **Install KuasabyRickworks**.
 
 **Edge on a computer**
 
@@ -49,7 +49,7 @@ Some browsers do not offer a prompt. Then **Get the app** shows the steps for yo
 
 ## Common problems
 
-- **This browser can’t install apps. Open openkuasa.com in Chrome, Edge or Safari.** Some browsers, such as Firefox, cannot install apps. Open OpenKuasa in Chrome, Edge or Safari instead.
+- **This browser can’t install apps. Open openkuasa.com in Chrome, Edge or Safari.** Some browsers, such as Firefox, cannot install apps. Open KuasabyRickworks in Chrome, Edge or Safari instead.
 - Can't find **Get the app**? You may already be using the installed app, where it is hidden.
 
 ## Related

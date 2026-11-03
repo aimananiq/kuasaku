@@ -1,14 +1,14 @@
 import type { MetadataRoute } from 'next';
 
 /**
- * Makes OpenKuasa installable from the website: its own icon and window on phones and laptops.
+ * Makes KuasabyRickworks installable from the website: its own icon and window on phones and laptops.
  * The icons are listed in src/proxy.ts so they load without the session check.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: '/',
-    name: 'OpenKuasa',
-    short_name: 'OpenKuasa',
+    name: 'KuasabyRickworks',
+    short_name: 'KuasabyRickworks',
     description: 'The community-built, open-source operating system for your business.',
     start_url: '/command',
     scope: '/',

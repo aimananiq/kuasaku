@@ -1,10 +1,10 @@
 ---
-title: Contribute to OpenKuasa
-description: The rules, the Contributor License Agreement, branch names and pull requests for contributing to OpenKuasa.
+title: Contribute to KuasabyRickworks
+description: The rules, the Contributor License Agreement, branch names and pull requests for contributing to KuasabyRickworks.
 order: 9
-ask: How do I contribute a change to OpenKuasa?
+ask: How do I contribute a change to KuasabyRickworks?
 ---
-OpenKuasa is built by its contributors. Code, design, docs, translations, bug reports and ideas are all welcome. The full guide is `CONTRIBUTING.md` in the repository.
+KuasabyRickworks is built by its contributors. Code, design, docs, translations, bug reports and ideas are all welcome. The full guide is `CONTRIBUTING.md` in the repository.
 
 ## Who can do this
 
@@ -68,5 +68,5 @@ Pull requests are squash-merged, so your commits become one commit on `main` wit
 ## Related
 
 - [Add a screen](/docs/developers/add-a-screen)
-- [How OpenKuasa is built](/docs/developers/architecture)
+- [How KuasabyRickworks is built](/docs/developers/architecture)
 - [Run your own copy](/docs/developers/self-hosting)

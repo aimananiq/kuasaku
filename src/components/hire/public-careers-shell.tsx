@@ -29,7 +29,7 @@ export function PublicCareersShell({ children }: { children: ReactNode }) {
           prefetch={false}
           className={`rounded-sm underline-offset-4 hover:text-foreground hover:underline ${CAREERS_LINK_FOCUS}`}
         >
-          Powered by OpenKuasa
+          Powered by KuasabyRickworks
         </Link>
       </footer>
     </div>

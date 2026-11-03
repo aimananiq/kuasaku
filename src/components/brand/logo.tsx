@@ -10,7 +10,7 @@ type LogoProps = {
 };
 
 /**
- * OpenKuasa brand lockup: an emerald mark with a keris (after Taming Sari),
+ * KuasabyRickworks brand lockup: an emerald mark with a keris (after Taming Sari),
  * optionally followed by the wordmark.
  */
 export function Logo({
@@ -18,7 +18,7 @@ export function Logo({
   markClassName,
   wordmarkClassName,
   showWordmark = true,
-  wordmark = 'OpenKuasa',
+  wordmark = 'KuasabyRickworks',
 }: LogoProps) {
   return (
     <span className={cn('inline-flex items-center gap-2.5', className)}>

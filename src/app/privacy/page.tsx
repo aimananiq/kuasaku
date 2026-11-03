@@ -6,7 +6,7 @@ import { GitHubIcon } from '@/components/brand/github-icon';
 import { REPO_URL } from '@/config/marketing';
 
 export const metadata: Metadata = {
-  title: 'Privacy · OpenKuasa',
+  title: 'Privacy · KuasabyRickworks',
 };
 
 type Section = {
@@ -18,7 +18,7 @@ type Section = {
 const SECTIONS: Section[] = [
   {
     h: 'The short version',
-    p: 'OpenKuasa is free, open-source software that you host yourself. When you self-host, the OpenKuasa project does not run your instance and does not collect, receive or store any of your data.',
+    p: 'KuasabyRickworks is free, open-source software that you host yourself. When you self-host, the KuasabyRickworks project does not run your instance and does not collect, receive or store any of your data.',
   },
   {
     h: 'What the project collects',
@@ -26,15 +26,15 @@ const SECTIONS: Section[] = [
   },
   {
     h: 'Who is responsible for your data',
-    p: 'Whoever runs an OpenKuasa instance is responsible for the data in it. If you self-host, that is you: you decide what is collected, where it is stored, who can access it and how long it is kept, and you are responsible for complying with the laws that apply to you, such as Malaysia\'s Personal Data Protection Act 2010.',
+    p: 'Whoever runs an KuasabyRickworks instance is responsible for the data in it. If you self-host, that is you: you decide what is collected, where it is stored, who can access it and how long it is kept, and you are responsible for complying with the laws that apply to you, such as Malaysia\'s Personal Data Protection Act 2010.',
   },
   {
     h: 'The planned hosted version',
-    p: 'A paid hosted version of OpenKuasa is planned but is not available yet. Before it accepts any customers it will publish its own privacy policy describing what is collected, how it is used and where it is stored. Until then, this page covers the self-hosted software only.',
+    p: 'A paid hosted version of KuasabyRickworks is planned but is not available yet. Before it accepts any customers it will publish its own privacy policy describing what is collected, how it is used and where it is stored. Until then, this page covers the self-hosted software only.',
   },
   {
     h: 'Using an instance run by someone else',
-    p: 'If a company or another person gave you access to an OpenKuasa instance, they are the operator of that instance and their privacy policy applies, not this page. Contact them with any request about your data. The OpenKuasa project has no access to it.',
+    p: 'If a company or another person gave you access to an KuasabyRickworks instance, they are the operator of that instance and their privacy policy applies, not this page. Contact them with any request about your data. The KuasabyRickworks project has no access to it.',
   },
   {
     h: 'Third-party services',
@@ -46,7 +46,7 @@ const SECTIONS: Section[] = [
   },
   {
     h: 'Independence',
-    p: 'OpenKuasa is a community-run project. It is not affiliated with any other company or product, and this page says nothing about how any third party handles data.',
+    p: 'KuasabyRickworks is a community-run project. It is not affiliated with any other company or product, and this page says nothing about how any third party handles data.',
   },
   {
     h: 'Questions',
@@ -60,7 +60,7 @@ export default function PrivacyPage() {
     <div className="min-h-dvh w-full bg-background">
       <header className="border-b">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
-          <Link href="/" aria-label="OpenKuasa home">
+          <Link href="/" aria-label="KuasabyRickworks home">
             <Logo />
           </Link>
           <Link

@@ -2,7 +2,7 @@
 title: Invite your team
 description: Create invite links for the people you work with, give each a role, and change or remove members later.
 order: 5
-ask: How do I invite someone to my OpenKuasa workspace and choose their role?
+ask: How do I invite someone to my KuasabyRickworks workspace and choose their role?
 screen: /account/team
 ---
 You add people to your workspace with invite links. Each link is for one email address and one role.
@@ -21,7 +21,7 @@ Only workspace owners and admins can invite, change roles and remove members. Me
 4. Click **Create invite link**.
 5. Click **Copy link** and send the link to the person yourself, for example by chat or email.
 
-OpenKuasa does not email the invite. The link works for 7 days, and only for the email you entered. The person opens it and follows [Join a workspace from an invite](/docs/getting-started/join-a-workspace).
+KuasabyRickworks does not email the invite. The link works for 7 days, and only for the email you entered. The person opens it and follows [Join a workspace from an invite](/docs/getting-started/join-a-workspace).
 
 If you invite the same email again, the new link replaces the old one.
 

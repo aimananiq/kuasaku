@@ -1,6 +1,6 @@
 ---
 title: Create your account and workspace
-description: Sign up for OpenKuasa and get a workspace for your business in six short steps.
+description: Sign up for KuasabyRickworks and get a workspace for your business in six short steps.
 order: 1
 ask: How do I sign up and create a workspace for my business?
 ---
@@ -12,7 +12,7 @@ Anyone with an email address. You do not need an invite. If someone sent you an 
 
 ## Steps
 
-1. On the OpenKuasa website, click **Get Started**. (From the sign-in page, click **Sign up**.)
+1. On the KuasabyRickworks website, click **Get Started**. (From the sign-in page, click **Sign up**.)
 2. **Which best describes your role?** Pick the card that fits you, then click **Continue**.
 3. **Tell us about your company.** Fill in **Company name**, **Industry**, **Company size** and, if you like, **Company website (optional)**. Click **Continue**.
 4. **What would you like to focus on first?** Pick one or more cards, then click **Continue**.
@@ -23,11 +23,11 @@ Anyone with an email address. You do not need an invite. If someone sent you an 
 
 From step 2 on, you can go back a step with **Back**. The bar at the bottom shows how far along you are.
 
-When the account is ready, OpenKuasa opens Tuah, the home screen.
+When the account is ready, KuasabyRickworks opens Tuah, the home screen.
 
-If you see **Check your email to finish signing up** instead, open the link in that email to confirm your address, then sign in. If OpenKuasa shows the setup steps again, go through them and click **Create account**. This time it makes your workspace.
+If you see **Check your email to finish signing up** instead, open the link in that email to confirm your address, then sign in. If KuasabyRickworks shows the setup steps again, go through them and click **Create account**. This time it makes your workspace.
 
-The last step warns that OpenKuasa is a work in progress. Some screens work with your own data, and the rest still show sample data. Do not rely on it to run your business yet.
+The last step warns that KuasabyRickworks is a work in progress. Some screens work with your own data, and the rest still show sample data. Do not rely on it to run your business yet.
 
 ## Common problems
 

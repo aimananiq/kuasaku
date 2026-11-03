@@ -1,5 +1,5 @@
 /**
- * /api/mcp — OpenKuasa's MCP server, for Claude, Cursor, Codex and any other MCP client.
+ * /api/mcp — KuasabyRickworks's MCP server, for Claude, Cursor, Codex and any other MCP client.
  *
  * Stateless: every POST gets its own server and transport, after the bearer credential has been turned into the
  * person (see `resolveCaller`). A request without a valid credential is refused before its body is read. There is

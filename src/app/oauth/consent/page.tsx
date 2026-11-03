@@ -20,7 +20,7 @@ import {
 } from './consent';
 
 export const metadata: Metadata = {
-  title: 'Connect an AI tool · OpenKuasa',
+  title: 'Connect an AI tool · KuasabyRickworks',
 };
 
 function Refused({ message }: { message: string }) {
@@ -31,7 +31,7 @@ function Refused({ message }: { message: string }) {
         <p className="text-sm text-muted-foreground">{message}</p>
       </div>
       <Button asChild variant="outline" className="w-full" size="lg">
-        <Link href="/command">Go to OpenKuasa</Link>
+        <Link href="/command">Go to KuasabyRickworks</Link>
       </Button>
     </AuthShell>
   );
@@ -62,7 +62,7 @@ function hostOf(uri: string): string | null {
 }
 
 /**
- * "Sign in with OpenKuasa": Supabase's OAuth server sends people here with `authorization_id` when an AI tool
+ * "Sign in with KuasabyRickworks": Supabase's OAuth server sends people here with `authorization_id` when an AI tool
  * (Claude, Cursor, Codex…) connects. It names the tool, the workspace the person has open and the person, and asks
  * Allow or Don't allow. Allow binds the connection to that workspace (see `actions.ts`).
  */
@@ -111,9 +111,9 @@ export default async function OAuthConsentPage({
   return (
     <AuthShell>
       <div className="space-y-1.5 text-center">
-        <h1 className="text-2xl font-bold tracking-tight">{`Allow ${client} to sign in to OpenKuasa as ${person}?`}</h1>
+        <h1 className="text-2xl font-bold tracking-tight">{`Allow ${client} to sign in to KuasabyRickworks as ${person}?`}</h1>
         <p className="text-sm text-muted-foreground">
-          It will be able to do anything you can do in OpenKuasa, as you, until you disconnect it in Account →
+          It will be able to do anything you can do in KuasabyRickworks, as you, until you disconnect it in Account →
           Developers.
         </p>
         <p className="text-sm text-muted-foreground">{`Its AI tool works in ${workspace}.`}</p>

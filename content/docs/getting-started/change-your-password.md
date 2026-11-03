@@ -1,8 +1,8 @@
 ---
 title: Change your password and sign out other devices
-description: Set a new password for your OpenKuasa account, and sign out everywhere except the browser you are using.
+description: Set a new password for your KuasabyRickworks account, and sign out everywhere except the browser you are using.
 order: 10
-ask: How do I change my password and sign out of OpenKuasa on my other devices?
+ask: How do I change my password and sign out of KuasabyRickworks on my other devices?
 screen: /account/security
 ---
 You change your password on the **Security** page. The same page lets you sign out of every other device.
@@ -20,7 +20,7 @@ Every signed-in person can change their own password, whatever their role. Demo 
 3. Enter a **New password** of at least 8 characters, and type it again in **Confirm new password**.
 4. Click **Update password**.
 
-When you see **Password updated.**, your other devices are signed out. You stay signed in on this browser. OpenKuasa also sends you a notification that your password was changed.
+When you see **Password updated.**, your other devices are signed out. You stay signed in on this browser. KuasabyRickworks also sends you a notification that your password was changed.
 
 ### Sign out other devices
 

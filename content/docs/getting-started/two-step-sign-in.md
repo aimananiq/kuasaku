@@ -23,7 +23,7 @@ Install an authenticator app on your phone. Any app that shows 6-digit sign-in c
 2. Under **Two-factor authentication**, next to **Authenticator app**, click **Set up**.
 3. Scan the QR code with your authenticator app. If you can't scan it, type the key shown under **Can't scan it? Enter this key by hand:** into the app.
 4. Enter the **6-digit code** your app shows and click **Turn on**.
-5. OpenKuasa shows 10 recovery codes under **Save your recovery codes**. Click **Copy** or **Download (.txt)** and keep them somewhere safe.
+5. KuasabyRickworks shows 10 recovery codes under **Save your recovery codes**. Click **Copy** or **Download (.txt)** and keep them somewhere safe.
 6. Click **I've saved these codes**.
 
 The recovery codes are shown only once. Each one works once.
@@ -56,7 +56,7 @@ Your old recovery codes stop working. Save the new ones.
 1. On the [Security](/account/security) page, click **Turn off**.
 2. Enter a code from your app and click **Turn off** again.
 
-Your recovery codes are deleted. OpenKuasa sends you a notification when two-step sign-in is turned off.
+Your recovery codes are deleted. KuasabyRickworks sends you a notification when two-step sign-in is turned off.
 
 ## Common problems
 

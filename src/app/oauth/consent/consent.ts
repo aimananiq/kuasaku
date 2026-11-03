@@ -11,8 +11,8 @@ import { createClient } from '@/lib/supabase/server';
 export const NOT_VALID = 'This sign-in link is not valid. Start connecting again from your AI tool.';
 export const EXPIRED = 'This sign-in request has expired. Start connecting again from your AI tool.';
 export const OTHER_ACCOUNT = 'This sign-in request is for another account. Sign out, then connect again from your AI tool.';
-export const DEMO = "The demo can't connect to AI tools. Sign in with your own OpenKuasa account.";
-export const NO_WORKSPACE = 'Open a workspace in OpenKuasa first, then connect again from your AI tool.';
+export const DEMO = "The demo can't connect to AI tools. Sign in with your own KuasabyRickworks account.";
+export const NO_WORKSPACE = 'Open a workspace in KuasabyRickworks first, then connect again from your AI tool.';
 export const WORKSPACE_CHANGED = 'Your open workspace changed. Reload this page to see which workspace you are allowing.';
 export const FAILED = 'Could not connect just now. Try again.';
 export const SIGN_IN_OFF =

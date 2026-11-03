@@ -5,7 +5,7 @@ order: 8
 ask: How do I add my OpenRouter key?
 screen: /account/ai
 ---
-The OpenKuasa assistants run on your own OpenRouter account. You add one key for your workspace, and everyone in it can chat.
+The KuasabyRickworks assistants run on your own OpenRouter account. You add one key for your workspace, and everyone in it can chat.
 
 ## Why you need a key
 
@@ -32,7 +32,7 @@ Get a key from OpenRouter:
 2. Paste the key into **OpenRouter API key**.
 3. Click **Save key**.
 
-OpenKuasa checks the key with OpenRouter first. The key is stored sealed (encrypted) and is never shown again. Only its last four characters are shown, so you can tell which key is in use. The status changes to **Active**.
+KuasabyRickworks checks the key with OpenRouter first. The key is stored sealed (encrypted) and is never shown again. Only its last four characters are shown, so you can tell which key is in use. The status changes to **Active**.
 
 ![The Workspace key card as the demo workspace shows it: read-only, with no key](/docs-media/getting-started/ai-key.png)
 
@@ -47,7 +47,7 @@ To change it, paste a new key into **Replace with a new key** and click **Replac
 - **That does not look like an OpenRouter key. It should start with sk-or-.** Copy the whole key again from OpenRouter.
 - **OpenRouter rejected that key. Check it and try again.** The key is wrong or was deleted in OpenRouter. Make a new one.
 - **Could not reach OpenRouter to check the key. Please try again.** Nothing was saved. Try again in a moment.
-- **This server is not set up to store workspace keys yet. The host needs AI_KEYS_ENCRYPTION_SECRET set.** Whoever runs this copy of OpenKuasa has to set that up first.
+- **This server is not set up to store workspace keys yet. The host needs AI_KEYS_ENCRYPTION_SECRET set.** Whoever runs this copy of KuasabyRickworks has to set that up first.
 - **That question was not sent: you have reached today’s chat limit. It resets at midnight UTC (8 am Malaysia time).** You used today's 200 requests. Try again after 8 am Malaysia time.
 - **Your workspace key could not be used on this server. Ask an owner to save it again.** An owner or admin should paste the key again and click **Replace key**.
 

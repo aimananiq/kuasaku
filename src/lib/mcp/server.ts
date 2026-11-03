@@ -28,7 +28,7 @@ const PRODUCTS = ['reach', 'crm', 'hire', 'people', 'finance'] as const satisfie
 
 /** Tuah's rules that live only in its prompts, not in code (src/lib/ai/agents/prompts.ts). */
 export const INSTRUCTIONS = [
-  'OpenKuasa runs a business\'s marketing, CRM, hiring, HR and finance, as the person signed in.',
+  'KuasabyRickworks runs a business\'s marketing, CRM, hiring, HR and finance for the signed-in user',
   '- Look up first: find a record\'s id with openkuasa_read. Never ask for an id or make one up. If more than one ' +
     'record matches, change nothing: say what matches and ask which.',
   '- One change per call. Asked for a group, list who matches and ask which to start with.',
@@ -143,9 +143,9 @@ export function createMcpServer(caller: McpCaller, deps: McpServerDeps = {}): Mc
   server.registerTool(
     'openkuasa_tools',
     {
-      title: 'List OpenKuasa operations',
+      title: 'List KuasabyRickworks operations',
       description:
-        'Lists the operations you can run in this OpenKuasa workspace: each one\'s name, product, kind (read or ' +
+        'Lists the operations you can run in this KuasabyRickworks workspace: each one\'s name, product, kind (read or ' +
         'write) and input schema. Pass a product to see only its operations.',
       inputSchema: { product: z.enum(PRODUCTS).optional() },
       annotations: { readOnlyHint: true },
@@ -158,7 +158,7 @@ export function createMcpServer(caller: McpCaller, deps: McpServerDeps = {}): Mc
   server.registerTool(
     'openkuasa_read',
     {
-      title: 'Look something up in OpenKuasa',
+      title: 'Look something up in KuasabyRickworks',
       description:
         'Runs one read operation (kind "read" in openkuasa_tools) with its arguments and returns the result. ' +
         'Reading a CV returns the file as well.',
@@ -190,7 +190,7 @@ export function createMcpServer(caller: McpCaller, deps: McpServerDeps = {}): Mc
   server.registerTool(
     'openkuasa_change',
     {
-      title: 'Make a change in OpenKuasa',
+      title: 'Make a change in KuasabyRickworks',
       description:
         'Runs one write operation (kind "write" in openkuasa_tools) with its arguments. Some changes come back ' +
         'with a note and a confirm token instead: show the person the note, and only after they agree send the ' +

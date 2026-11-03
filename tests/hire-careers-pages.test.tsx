@@ -166,7 +166,7 @@ describe('the board page', () => {
 
   it('links out only to the credit at the foot', async () => {
     const html = await renderBoard();
-    expect(html).toMatch(/<footer[^>]*>\s*<a[^>]*href="\/"[^>]*>Powered by OpenKuasa<\/a>/);
+    expect(html).toMatch(/<footer[^>]*>\s*<a[^>]*href="\/"[^>]*>Powered by KuasabyRickworks<\/a>/);
     expect(html).not.toMatch(/<(script|form|button|input)[\s>]/);
   });
 
@@ -318,7 +318,7 @@ describe('the page for a link with nothing behind it', () => {
     expect(html).toMatch(/<h1[^>]*>This page isn(?:'|&#x27;)t available<\/h1>/);
     expect(html).toContain('The role may have been filled or the link may be out of date.');
     expect(count(html, /<main[^>]*id="main"/g)).toBe(1);
-    expect(html).toContain('Powered by OpenKuasa');
+    expect(html).toContain('Powered by KuasabyRickworks');
   });
   it('carries its own title and asks not to be indexed, since a not-found response takes its head from here', () => {
     expect(notFoundMetadata).toMatchObject({
@@ -338,7 +338,7 @@ describe('the page for anything that went wrong under /careers', () => {
     expect(html).toMatch(/<h1[^>]*>Something went wrong<\/h1>/);
     expect(html).toMatch(/This page couldn(?:'|&#x27;)t be shown\. Please try again\./);
     expect(count(html, /<main[^>]*id="main"/g)).toBe(1);
-    expect(html).toContain('Powered by OpenKuasa');
+    expect(html).toContain('Powered by KuasabyRickworks');
     const button = /<button([^>]*)>([\s\S]*?)<\/button>/.exec(html)!;
     expect(button[1]).toContain('type="button"');
     expect(button[2]).toBe('Try again');

@@ -1,8 +1,8 @@
 ---
 title: Keep the database up to date
-description: Apply OpenKuasa's database migrations to your Supabase project with pnpm db:migrate.
+description: Apply KuasabyRickworks's database migrations to your Supabase project with pnpm db:migrate.
 order: 3
-ask: How do I apply OpenKuasa's database migrations to my Supabase project?
+ask: How do I apply KuasabyRickworks's database migrations to my Supabase project?
 ---
 The database is built by the SQL files in `supabase/migrations`. After every pull from main, bring your Supabase project up to date with them.
 
@@ -53,4 +53,4 @@ Each migration runs in one transaction together with its record in `supabase_mig
 ## Related
 
 - [Run your own copy](/docs/developers/self-hosting)
-- [How OpenKuasa is built](/docs/developers/architecture)
+- [How KuasabyRickworks is built](/docs/developers/architecture)

@@ -19,7 +19,7 @@ Without an OpenRouter key, each person gets 3 free questions a week. They come b
 
 ## Steps
 
-1. Open **Tuah**: the compass icon at the top of the left rail, just under the OpenKuasa logo. Clicking the logo also opens it.
+1. Open **Tuah**: the compass icon at the top of the left rail, just under the KuasabyRickworks logo. Clicking the logo also opens it.
 2. Type your question in the box that says **Ask anything…**.
 3. Press Enter to send. Press Shift and Enter together to start a new line instead.
 4. Wait for the answer. Three dots show while Tuah works.
@@ -28,7 +28,7 @@ Without an OpenRouter key, each person gets 3 free questions a week. They come b
 
 To get started faster, click one of the suggested questions under the box, such as **How is my business doing this month?**. Or click one of the buttons **Ask the CEO**, **Ask the CMO**, **Ask the CHRO** or **Ask the CFO**. Each one sends a ready question about the business, your ads, your team or overdue invoices.
 
-Tuah can also explain how OpenKuasa works. Ask "How do I…" and it answers from these guides.
+Tuah can also explain how KuasabyRickworks works. Ask "How do I…" and it answers from these guides.
 
 Tuah replies in the language you write in, English or Bahasa Malaysia. Under the box you will see **AI can make mistakes. Check important info.** Check figures before you act on them.
 

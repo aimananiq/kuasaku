@@ -45,7 +45,7 @@ describe('app manifest', () => {
   const m = manifest();
 
   test('opens in its own window on the Tuah home', () => {
-    expect(m.name).toBe('OpenKuasa');
+    expect(m.name).toBe('KuasabyRickworks');
     expect(m.display).toBe('standalone');
     expect(m.start_url).toBe('/command');
   });

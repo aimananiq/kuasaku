@@ -86,7 +86,7 @@ function RailSignOut() {
 export function ProductRail({ activeKey }: { activeKey: string | null }) {
   return (
     <aside className="flex h-full w-16 shrink-0 flex-col items-center border-r bg-sidebar py-3">
-      <Link href="/command" aria-label="OpenKuasa home" className="mb-3">
+      <Link href="/command" aria-label="KuasabyRickworks home" className="mb-3">
         <Logo showWordmark={false} markClassName="size-9 rounded-xl" />
       </Link>
 

@@ -1,7 +1,7 @@
 /**
  * Switches for the MCP server, read on the server per call.
  *
- * `MCP_SIGN_IN_ENABLED`: "Sign in with OpenKuasa" connections (Supabase OAuth tokens on /api/mcp, the consent screen,
+ * `MCP_SIGN_IN_ENABLED`: "Sign in with KuasabyRickworks" connections (Supabase OAuth tokens on /api/mcp, the consent screen,
  * Connected apps). On only when exactly `true`; off by default, so AI tools connect with API keys.
  */
 

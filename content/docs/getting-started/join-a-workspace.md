@@ -1,8 +1,8 @@
 ---
 title: Join a workspace from an invite
-description: Open an invite link to join your team's OpenKuasa workspace, with a new account or the one you have.
+description: Open an invite link to join your team's KuasabyRickworks workspace, with a new account or the one you have.
 order: 6
-ask: Someone sent me an OpenKuasa invite link. How do I join their workspace?
+ask: Someone sent me an KuasabyRickworks invite link. How do I join their workspace?
 ---
 An invite link lets you join someone else's workspace. You join with the role they chose for you.
 
@@ -12,7 +12,7 @@ The person the invite was made for. The link works only for the email address it
 
 ## Before you start
 
-You need the invite link. OpenKuasa does not email it: the owner or admin who invited you sends it to you themselves.
+You need the invite link. KuasabyRickworks does not email it: the owner or admin who invited you sends it to you themselves.
 
 ## Steps
 
@@ -23,7 +23,7 @@ You need the invite link. OpenKuasa does not email it: the owner or admin who in
 3. Enter your **Full name** and a **Password** of at least 8 characters. The email is filled in from the invite.
 4. Click **Create account and join** followed by the workspace name.
 
-If OpenKuasa asks you to check your email, open the confirmation link in that email. It brings you back to the invite, signed in. Click **Join** followed by the workspace name to finish.
+If KuasabyRickworks asks you to check your email, open the confirmation link in that email. It brings you back to the invite, signed in. Click **Join** followed by the workspace name to finish.
 
 ### Join with an account you already have
 
@@ -35,7 +35,7 @@ If you use two-step sign-in, enter the code from your app. You then come back to
 
 If you are already signed in with the invited email, the page shows one button, **Join** followed by the workspace name. Click it.
 
-When you have joined, OpenKuasa opens Tuah, the home screen of the workspace.
+When you have joined, KuasabyRickworks opens Tuah, the home screen of the workspace.
 
 ### Switch between workspaces
 

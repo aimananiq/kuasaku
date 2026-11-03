@@ -56,7 +56,7 @@ export default function ChangelogPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight">Product Changelog</h1>
         <p className="text-sm text-muted-foreground">
-          What&apos;s new in OpenKuasa.
+          What&apos;s new in KuasabyRickworks.
         </p>
       </div>
 

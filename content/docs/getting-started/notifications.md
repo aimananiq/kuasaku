@@ -2,7 +2,7 @@
 title: Choose your notifications
 description: Pick which events you hear about in the notification bell, and see your latest notifications.
 order: 12
-ask: How do I choose which notifications I get in OpenKuasa?
+ask: How do I choose which notifications I get in KuasabyRickworks?
 screen: /account/notifications
 ---
 Notifications tell you when something needs you, such as a request waiting for your approval. They appear under the bell at the top of the app.
@@ -46,7 +46,7 @@ _Shown from the sample workspace, where editing is switched off._
 
 ### Get push on your phone or computer
 
-Push shows a notification on your device even when OpenKuasa isn't open. Turn it on separately on each phone or computer you use.
+Push shows a notification on your device even when KuasabyRickworks isn't open. Turn it on separately on each phone or computer you use.
 
 1. Open [Notifications](/account/notifications) on the device you want push on.
 2. Under **Push on this device**, click **Turn on**.
@@ -58,7 +58,7 @@ Where it works:
 
 - **Laptop or desktop:** Chrome, Edge or Firefox. On a Mac, Safari 16 or later also works.
 - **Android:** Chrome or Firefox.
-- **iPhone or iPad:** you need iOS 16.4 or later. Add OpenKuasa to your Home Screen first (**Share** → **Add to Home Screen**), open it from there, then turn push on.
+- **iPhone or iPad:** you need iOS 16.4 or later. Add KuasabyRickworks to your Home Screen first (**Share** → **Add to Home Screen**), open it from there, then turn push on.
 
 Push follows the **Push** ticks under **What you get notified about**. It only goes out for events whose **In-app** box is ticked. While **In-app** is off, nothing is pushed, except security alerts. **Requests from your team** has push ticked to start with, so approvals waiting on you reach you without any setup. If you saved your choices before push existed, tick it yourself.
 
@@ -82,9 +82,9 @@ A notification can arrive up to 5 minutes after the event. If you already read i
 
 ## Common problems
 
-- **Push isn't set up on this server.** The people who run your OpenKuasa haven't set push up yet.
-- **Add OpenKuasa to your Home Screen first.** On an iPhone or iPad, push only works from the Home Screen app.
-- **Notifications are blocked for this site.** Allow notifications for OpenKuasa in your browser settings, then click **Turn on** again.
+- **Push isn't set up on this server.** The people who run your KuasabyRickworks haven't set push up yet.
+- **Add KuasabyRickworks to your Home Screen first.** On an iPhone or iPad, push only works from the Home Screen app.
+- **Notifications are blocked for this site.** Allow notifications for KuasabyRickworks in your browser settings, then click **Turn on** again.
 - **You can have push on up to 10 devices.** Remove a device you no longer use, then try again.
 - **Please choose valid quiet hours.** Pick a time from each list.
 - **The demo workspace is read-only. Sign up to save changes.** Demo choices cannot be changed.

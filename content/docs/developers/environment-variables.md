@@ -1,10 +1,10 @@
 ---
 title: Environment variables
-description: Every setting a self-hosted OpenKuasa reads from its environment, and what each one turns on.
+description: Every setting a self-hosted KuasabyRickworks reads from its environment, and what each one turns on.
 order: 2
-ask: Which environment variables does a self-hosted OpenKuasa need?
+ask: Which environment variables does a self-hosted KuasabyRickworks need?
 ---
-OpenKuasa reads its settings from the environment. Locally, put them in `.env.local` in the project root. On a server, set them in your host's settings.
+KuasabyRickworks reads its settings from the environment. Locally, put them in `.env.local` in the project root. On a server, set them in your host's settings.
 
 ## Who can do this
 
@@ -72,7 +72,7 @@ Keep the same pair on every host. A new pair cuts off every device that turned p
 
 | Variable | What it is for |
 | --- | --- |
-| `MCP_SIGN_IN_ENABLED` | `true` turns on "Sign in with OpenKuasa" for MCP apps. Off by default, so AI tools connect with API keys only. See [Turn on Sign in with OpenKuasa](/docs/developers/mcp-sign-in). |
+| `MCP_SIGN_IN_ENABLED` | `true` turns on "Sign in with KuasabyRickworks" for MCP apps. Off by default, so AI tools connect with API keys only. See [Turn on Sign in with KuasabyRickworks](/docs/developers/mcp-sign-in). |
 | `NEXT_PUBLIC_DEMO_ENABLED` | `1` shows the **Try the demo** button on the login page and lets the demo sign-in run. Unset, the demo sign-in answers "Demo is not available." |
 | `PUBLIC_SITE_URL` | The lasting address written into broadcast unsubscribe links. Without it, the address the request came in on is used. |
 | `OPENKUASA_PREVIEW` | `1` serves the sample-data preview from a production build. Read only when the Supabase values are missing. |

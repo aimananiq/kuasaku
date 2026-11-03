@@ -1,8 +1,8 @@
 ---
 title: AI models and keys
-description: How a self-hosted OpenKuasa pays for AI, which models it uses, and how workspace keys are kept.
+description: How a self-hosted KuasabyRickworks pays for AI, which models it uses, and how workspace keys are kept.
 order: 7
-ask: How do AI keys and models work on a self-hosted OpenKuasa?
+ask: How do AI keys and models work on a self-hosted KuasabyRickworks?
 ---
 The assistants and agents call models through OpenRouter. Each workspace can bring its own OpenRouter key. A server can also offer a few free questions on a platform key.
 

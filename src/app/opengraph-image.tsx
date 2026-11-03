@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { KERIS_BLADE, KERIS_GUARD, KERIS_HILT } from '@/components/brand/keris-mark';
 
 export const alt =
-  'OpenKuasa: run the whole business from one place. Six open-source business apps, named for the court of Melaka.';
+  'KuasabyRickworks: run the whole business from one place. Six open-source business apps, named for the court of Melaka.';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -116,7 +116,7 @@ export default async function Image() {
               </svg>
             </div>
             <div style={{ display: 'flex', fontSize: 38, fontWeight: 700, letterSpacing: -0.5 }}>
-              OpenKuasa
+              KuasabyRickworks
             </div>
           </div>
 

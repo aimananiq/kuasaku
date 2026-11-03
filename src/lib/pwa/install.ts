@@ -1,5 +1,5 @@
 /**
- * Installing OpenKuasa as an app from the website.
+ * Installing KuasabyRickworks as an app from the website.
  *
  * Chrome and Edge fire `beforeinstallprompt` once, early, often before any install link is on screen,
  * so the event is kept here and the links read it through `subscribe`/`getInstallState`.

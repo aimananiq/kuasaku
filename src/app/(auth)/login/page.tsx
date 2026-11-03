@@ -7,7 +7,7 @@ import { LoginForm } from '@/components/auth/login-form';
 import { signInReturnPath } from '@/lib/security/safe-path';
 
 export const metadata: Metadata = {
-  title: 'Sign in · OpenKuasa',
+  title: 'Sign in · KuasabyRickworks',
 };
 
 const NOTICES: Record<string, string> = {
@@ -30,7 +30,7 @@ export default async function LoginPage({
     <div className="flex min-h-dvh w-full">
       {/* form pane */}
       <div className="flex flex-1 flex-col px-6 py-8 sm:px-10 lg:px-16">
-        <Link href="/" aria-label="OpenKuasa home" className="w-fit">
+        <Link href="/" aria-label="KuasabyRickworks home" className="w-fit">
           <Logo />
         </Link>
 

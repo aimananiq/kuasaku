@@ -9,7 +9,7 @@ import { formatDate } from '@/components/account/dates';
 import { ReadOnlyNotice } from '@/components/account/settings-form';
 import { disconnectAppAction } from '@/app/account/developers/actions';
 
-/** An AI tool the person connected with "Sign in with OpenKuasa". */
+/** An AI tool the person connected with "Sign in with KuasabyRickworks". */
 export type ConnectedApp = {
   clientId: string;
   name: string;
@@ -102,7 +102,7 @@ export function ConnectedAppsCard({
   return (
     <BentoCard
       title="Connected apps"
-      subtitle="AI tools you connected with Sign in with OpenKuasa"
+      subtitle="AI tools you connected with Sign in with KuasabyRickworks"
       icon={Plug}
       className="col-span-2 md:col-span-12"
     >

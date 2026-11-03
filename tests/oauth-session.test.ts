@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 
 /**
- * A Supabase OAuth access token (an AI tool's "Sign in with OpenKuasa") is a full session of the person, so it is
+ * A Supabase OAuth access token (an AI tool's "Sign in with KuasabyRickworks") is a full session of the person, so it is
  * never an app session: the proxy strips a cookie session carrying one, and `getViewer` refuses it too.
  */
 

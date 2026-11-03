@@ -81,7 +81,7 @@ describe('the Push on this device card', () => {
   it('tells an iPhone in a browser tab to add the app to the Home Screen first', () => {
     const html = view({ support: 'ios-needs-install' });
     expect(text(html)).toContain(
-      'Add OpenKuasa to your Home Screen first (Share → Add to Home Screen), then turn push on here.',
+      'Add KuasabyRickworks to your Home Screen first (Share → Add to Home Screen), then turn push on here.',
     );
     expect(html).not.toMatch(/>Turn on<\/button>/);
   });

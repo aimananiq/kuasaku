@@ -1,10 +1,10 @@
 ---
 title: Ask the assistants
-description: Where to ask OpenKuasa's AI assistants a question, and how the free weekly questions work.
+description: Where to ask KuasabyRickworks's AI assistants a question, and how the free weekly questions work.
 order: 7
 ask: Where do I ask the assistants a question, and how many free questions do I get?
 ---
-OpenKuasa has an AI assistant for your whole business, and one for each product. You ask them in plain words.
+KuasabyRickworks has an AI assistant for your whole business, and one for each product. You ask them in plain words.
 
 ## Who can do this
 

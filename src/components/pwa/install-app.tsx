@@ -23,7 +23,7 @@ const icon = 'inline size-3.5 align-text-bottom';
 const STEPS: Record<InstallGuide, ReactNode[]> = {
   'chrome-desktop': [
     <>Click <EllipsisVertical aria-label="the three dots" className={icon} /> at the top right of Chrome.</>,
-    <>Choose &ldquo;Cast, save, and share&rdquo;, then &ldquo;Install OpenKuasa&rdquo;.</>,
+    <>Choose &ldquo;Cast, save, and share&rdquo;, then &ldquo;Install KuasabyRickworks&rdquo;.</>,
   ],
   'edge-desktop': [
     <>Click <Ellipsis aria-label="the three dots" className={icon} /> at the top right of Edge.</>,
@@ -88,9 +88,9 @@ export function GetAppButton({ className, children }: { className?: string; chil
           collisionPadding={16}
           className="z-50 w-72 rounded-xl border bg-popover p-4 text-popover-foreground shadow-lg"
         >
-          <p className="text-sm font-semibold">Install OpenKuasa</p>
+          <p className="text-sm font-semibold">Install KuasabyRickworks</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Get OpenKuasa in its own window, with its own icon. No download or app store needed.
+            Get KuasabyRickworks in its own window, with its own icon. No download or app store needed.
           </p>
           <InstallSteps className="mt-3 text-sm" />
         </Popover.Content>

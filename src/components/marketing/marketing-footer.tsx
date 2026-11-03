@@ -48,7 +48,7 @@ const COLUMNS: Col[] = [
   {
     title: 'Company',
     links: [
-      { label: 'About OpenKuasa', href: '#about' },
+      { label: 'About KuasabyRickworks', href: '#about' },
       { label: 'Contact Support', href: '/account/support' },
       { label: 'Terms & Conditions', href: '#terms' },
       { label: 'Privacy Policy', href: '/privacy' },
@@ -136,7 +136,7 @@ export function MarketingFooter() {
         </div>
 
         <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-mk-border pt-6 text-sm text-mk-muted dark:text-mk-subtle sm:flex-row sm:items-center">
-          <p>© 2026 OpenKuasa contributors · Independent open-source project, not affiliated with any other company or product.</p>
+          <p>© 2026 KuasabyRickworks contributors · Independent open-source project, not affiliated with any other company or product.</p>
           <span className="inline-flex items-center gap-2">
             <span className="size-2 rounded-full bg-primary" />
             All systems operational

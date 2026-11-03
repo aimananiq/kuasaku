@@ -23,7 +23,7 @@ type Support = PushSupport | 'checking';
 const SUPPORT_NOTES: Partial<Record<Support, string>> = {
   'not-configured': "Push isn't set up on this server.",
   'ios-needs-install':
-    'Add OpenKuasa to your Home Screen first (Share → Add to Home Screen), then turn push on here.',
+    'Add KuasabyRickworks to your Home Screen first (Share → Add to Home Screen), then turn push on here.',
   unsupported: "This browser can't get push notifications. Try Chrome, Edge, Firefox or Safari.",
 };
 

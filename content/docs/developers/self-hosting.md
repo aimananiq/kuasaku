@@ -1,10 +1,10 @@
 ---
 title: Run your own copy
-description: Self-host OpenKuasa on your own Supabase project and any Node server.
+description: Self-host KuasabyRickworks on your own Supabase project and any Node server.
 order: 1
-ask: How do I self-host OpenKuasa on my own Supabase project?
+ask: How do I self-host KuasabyRickworks on my own Supabase project?
 ---
-OpenKuasa is free to self-host under AGPL-3.0. You need a Supabase project for data and sign-in, and a server that runs Node.
+KuasabyRickworks is free to self-host under AGPL-3.0. You need a Supabase project for data and sign-in, and a server that runs Node.
 
 ## Who can do this
 
@@ -22,7 +22,7 @@ Anyone running their own copy. You need access to a Supabase project and to the 
 
 ```bash
 git clone https://github.com/OpenKuasa/OpenKuasa.git
-cd OpenKuasa
+cd KuasabyRickworks
 pnpm install
 pnpm dev
 ```
@@ -87,4 +87,4 @@ Some background work runs only when your scheduler calls it. See [Scheduled jobs
 - [Environment variables](/docs/developers/environment-variables)
 - [Keep the database up to date](/docs/developers/database-migrations)
 - [Scheduled jobs](/docs/developers/scheduled-jobs)
-- [How OpenKuasa is built](/docs/developers/architecture)
+- [How KuasabyRickworks is built](/docs/developers/architecture)

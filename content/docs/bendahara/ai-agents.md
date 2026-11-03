@@ -5,7 +5,7 @@ order: 2
 ask: How do I get the finance agent to warn me about overdue invoices?
 screen: /finance/agents
 ---
-The finance AI agent watches your books for what you ask, and suggests notes on your documents for you to approve. It does not post, pay or change your figures. How agents, focus, schedules and limits work across OpenKuasa is explained in [AI agents and focus](/docs/tuah/ai-agents).
+The finance AI agent watches your books for what you ask, and suggests notes on your documents for you to approve. It does not post, pay or change your figures. How agents, focus, schedules and limits work across KuasabyRickworks is explained in [AI agents and focus](/docs/tuah/ai-agents).
 
 ## Who can do this
 

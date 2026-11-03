@@ -1,5 +1,5 @@
 /**
- * Telling a Supabase OAuth access token (issued to an AI tool through "Sign in with OpenKuasa") from an app session.
+ * Telling a Supabase OAuth access token (issued to an AI tool through "Sign in with KuasabyRickworks") from an app session.
  *
  * Such a token is a full session of the person, so only the MCP endpoint may accept it: never the app's cookie
  * session, never key making. The claims are read without checking the signature, so this only ever refuses;

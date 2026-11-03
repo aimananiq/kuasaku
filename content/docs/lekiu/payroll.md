@@ -7,7 +7,7 @@ screen: /people/payroll
 ---
 On **Payroll**, owners and admins run payroll month by month. A run starts as a draft that employees cannot see. When you mark it as paid, each employee sees their payslip on **My Payslips**.
 
-Marking a run as paid only records it in OpenKuasa. It does not move any money, make a bank file, or submit anything to EPF, SOCSO, EIS or LHDN. You pay and submit those yourself. It also posts nothing to Bendahara, so record the salaries there separately.
+Marking a run as paid only records it in KuasabyRickworks. It does not move any money, make a bank file, or submit anything to EPF, SOCSO, EIS or LHDN. You pay and submit those yourself. It also posts nothing to Bendahara, so record the salaries there separately.
 
 ## Who can do this
 

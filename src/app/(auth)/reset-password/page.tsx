@@ -11,7 +11,7 @@ import {
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
-  title: 'Set a new password · OpenKuasa',
+  title: 'Set a new password · KuasabyRickworks',
 };
 
 const linkClass = 'font-semibold text-primary hover:underline';

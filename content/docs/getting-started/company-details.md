@@ -41,7 +41,7 @@ The logo is shown at the top of letters.
 
 You see **Logo saved.**
 
-To take the logo off, click **Remove logo**. OpenKuasa asks **Remove the workspace logo? Letters will show the company name only.** Click **Remove logo** again to confirm, or **Keep** to leave it.
+To take the logo off, click **Remove logo**. KuasabyRickworks asks **Remove the workspace logo? Letters will show the company name only.** Click **Remove logo** again to confirm, or **Keep** to leave it.
 
 ## Common problems
 

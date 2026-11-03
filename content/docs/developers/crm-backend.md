@@ -56,6 +56,6 @@ Jebat sees these leads without a copy: its leads are the rows of `leads` plus ev
 
 ## Related
 
-- [How OpenKuasa is built](/docs/developers/architecture)
+- [How KuasabyRickworks is built](/docs/developers/architecture)
 - [Finance backend notes](/docs/developers/finance-backend)
 - [Keep the database up to date](/docs/developers/database-migrations)

@@ -6,8 +6,8 @@ import { getAllGuides } from '@/lib/docs/content';
 import { buildDocsIndex } from '@/lib/docs/search';
 import { DOC_SECTIONS } from '@/lib/docs/sections';
 
-const title = 'OpenKuasa Docs';
-const description = 'Guides for every OpenKuasa product, and developer docs.';
+const title = 'KuasabyRickworks Docs';
+const description = 'Guides for every KuasabyRickworks product, and developer docs.';
 
 export const metadata: Metadata = {
   title,
@@ -31,7 +31,7 @@ export default function DocsHome() {
           <p className="text-sm font-semibold tracking-wider text-mk-accent uppercase">Docs</p>
           <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">How can we help?</h1>
           <p className="mt-4 max-w-[60ch] text-lg text-mk-muted">
-            Plain-English guides for running your business on OpenKuasa. Search for what you need, or pick a
+            Plain-English guides for running your business on KuasabyRickworks. Search for what you need, or pick a
             topic below.
           </p>
           <div className="mt-8">

@@ -32,7 +32,7 @@ Up to 4 files can go with one question. The files stay in the chat. When you ope
 - **"Up to 4 files can go with one question."** Only the first 4 were added.
 - **"That is too much to attach in one chat (about 7 MB in total). Try a smaller file, or start a new chat."** Files you sent earlier in the chat count too, because they travel with every question. Start a new chat for more files.
 - **"That question was not sent. A free question can carry one small file (up to 2 MB). Add your OpenRouter key to attach more."** Without an OpenRouter key, a question can carry one file of up to 2 MB. No free question was used.
-- **"That question was not sent. One of the attached files cannot be read here."** OpenKuasa checks what each file really is, not just its name. Attach a PNG, JPEG, GIF or WebP picture, a PDF, or a text file.
+- **"That question was not sent. One of the attached files cannot be read here."** KuasabyRickworks checks what each file really is, not just its name. Attach a PNG, JPEG, GIF or WebP picture, a PDF, or a text file.
 - **"That question was not sent. Too many files are attached to this conversation."** or **"The attached files are too large together."** Remove some, or start a new chat.
 
 ## Related

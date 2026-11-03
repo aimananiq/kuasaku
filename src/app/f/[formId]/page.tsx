@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description: null,
     robots: ROBOTS,
-    // Replaces the site-wide share text, which is about OpenKuasa, not this form.
+    // Replaces the site-wide share text, which is about KuasabyRickworks, not this form.
     openGraph: { title },
     twitter: { card: 'summary', title },
   };

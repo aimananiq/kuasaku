@@ -36,11 +36,11 @@ export type McpCaller = {
 
 export type CallerResult = { ok: true; caller: McpCaller } | { ok: false; status: 401 | 403 | 503; message: string };
 
-export const SIGN_IN = 'Sign in to OpenKuasa or use an API key.';
+export const SIGN_IN = 'Sign in to KuasabyRickworks or use an API key.';
 export const CREDENTIAL_REFUSED =
-  'That API key or sign-in is not valid any more. Sign in to OpenKuasa again, or make a new API key.';
+  'That API key or sign-in is not valid any more. Sign in to KuasabyRickworks again, or make a new API key.';
 export const REMOVED = 'You are no longer a member of this workspace, so this connection cannot act in it.';
-export const CONNECT_AGAIN = 'Connect OpenKuasa again from your AI tool.';
+export const CONNECT_AGAIN = 'Connect KuasabyRickworks again from your AI tool.';
 export const FAILED = 'Your access could not be checked just now. Try again.';
 export const SIGN_IN_OFF = "Sign-in connections aren't available yet. Use an API key from Account → Developers.";
 export const MFA_NOT_SUPPORTED =
@@ -191,7 +191,7 @@ async function fromOAuth(token: string, supabase: SupabaseClient) {
 /**
  * The person behind the request's `Authorization: Bearer …`, acting in the workspace the credential is bound to,
  * with their role read now. 401 when there is no valid credential or the person left the workspace; 403 when they
- * now have another workspace open in OpenKuasa.
+ * now have another workspace open in KuasabyRickworks.
  */
 export async function resolveCaller(request: Request, clientName: string): Promise<CallerResult> {
   const token = bearerOf(request);
@@ -238,8 +238,8 @@ export async function resolveCaller(request: Request, clientName: string): Promi
       const other = (await nameOf(supabase, current.orgId)) ?? OTHER_WORKSPACE;
       // A sign-in connection is moved by disconnecting it and connecting again; a key by making another.
       const message = clientId
-        ? `This connection works in ${here}. Switch back to ${here} in OpenKuasa, or disconnect it in Account → Developers and connect again for ${other}.`
-        : `Switch back to ${here} in OpenKuasa, or connect again for ${other}.`;
+        ? `This connection works in ${here}. Switch back to ${here} in KuasabyRickworks, or disconnect it in Account → Developers and connect again for ${other}.`
+        : `Switch back to ${here} in KuasabyRickworks, or connect again for ${other}.`;
       return { ok: false, status: 403, message };
     }
 

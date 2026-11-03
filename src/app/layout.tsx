@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const title = 'OpenKuasa';
+const title = 'KuasabyRickworks';
 const description = 'The community-built, open-source operating system for your business.';
 
 // The share image comes from the opengraph-image file convention, so no `images` here.
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     title,
     description,
-    siteName: 'OpenKuasa',
+    siteName: 'KuasabyRickworks',
     type: 'website',
     url: '/',
   },
@@ -36,10 +36,10 @@ export const metadata: Metadata = {
     title,
     description,
   },
-  // Installed on an iPhone or iPad from Safari's "Add to Home Screen": opens full screen, named OpenKuasa.
+  // Installed on an iPhone or iPad from Safari's "Add to Home Screen": opens full screen, named KuasabyRickworks.
   appleWebApp: {
     capable: true,
-    title: 'OpenKuasa',
+    title: 'KuasabyRickworks',
     statusBarStyle: 'default',
   },
 };

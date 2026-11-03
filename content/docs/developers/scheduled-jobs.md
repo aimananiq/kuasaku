@@ -1,8 +1,8 @@
 ---
 title: Scheduled jobs
-description: Call OpenKuasa's background endpoints from your own scheduler, with CRON_SECRET.
+description: Call KuasabyRickworks's background endpoints from your own scheduler, with CRON_SECRET.
 order: 4
-ask: How do I set up the scheduled jobs for my self-hosted OpenKuasa?
+ask: How do I set up the scheduled jobs for my self-hosted KuasabyRickworks?
 ---
 Seven endpoints do background work. Nothing in the app calls them: your own scheduler does, for example a cron job every five minutes.
 

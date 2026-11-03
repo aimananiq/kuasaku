@@ -7,7 +7,7 @@ import { MFA_RECOVER_PATH, safeNextPath } from '@/lib/auth/mfa';
 import { requireMfaChallenge } from '../guard';
 
 export const metadata: Metadata = {
-  title: 'Two-factor authentication · OpenKuasa',
+  title: 'Two-factor authentication · KuasabyRickworks',
 };
 
 export default async function MfaVerifyPage({
@@ -24,7 +24,7 @@ export default async function MfaVerifyPage({
       <div className="space-y-1.5 text-center">
         <h1 className="text-3xl font-bold tracking-tight">Enter your code</h1>
         <p className="text-sm text-muted-foreground">
-          Open your authenticator app and enter the 6-digit code for OpenKuasa
+          Open your authenticator app and enter the 6-digit code for KuasabyRickworks
           OS.
         </p>
       </div>

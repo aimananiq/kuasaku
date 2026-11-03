@@ -67,7 +67,7 @@ export const NOTIFY_EVENTS = [
   { id: 'hr_shift_swap', name: 'Shift swaps', help: 'When a colleague asks to swap shifts with you, and each answer or decision on a swap' },
   { id: 'hiring', name: 'Hiring', help: 'When someone applies to one of your jobs' },
   { id: 'weekly_summary', name: 'Weekly summary', help: 'A Monday digest of last week across your workspace' },
-  { id: 'product_updates', name: 'Product updates', help: 'New features and improvements to OpenKuasa' },
+  { id: 'product_updates', name: 'Product updates', help: 'New features and improvements to KuasabyRickworks' },
 ] as const;
 export type NotifyEventId = (typeof NOTIFY_EVENTS)[number]['id'];
 

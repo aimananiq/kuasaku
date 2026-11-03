@@ -257,13 +257,13 @@ describe('resolveCaller', () => {
       ok: false,
       status: 403,
       message:
-        'This connection works in Kopi Co. Switch back to Kopi Co in OpenKuasa, or disconnect it in Account → Developers and connect again for Rimba Ventures.',
+        'This connection works in Kopi Co. Switch back to Kopi Co in KuasabyRickworks, or disconnect it in Account → Developers and connect again for Rimba Ventures.',
     });
     expect(db.bindings.get(`${ALICE}:claude-desktop`)).toBe(ORG_B);
   });
 
   test('an OAuth connection that cannot be bound is told to connect again', async () => {
-    const expected = { ok: false, status: 401, message: 'Connect OpenKuasa again from your AI tool.' };
+    const expected = { ok: false, status: 401, message: 'Connect KuasabyRickworks again from your AI tool.' };
     const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
       // The write is refused.
@@ -289,7 +289,7 @@ describe('resolveCaller', () => {
     keyResolvesTo(ALICE, ORG_A, 'alice-at-1');
     db.profiles.set(ALICE, ORG_B);
     const out = await resolveCaller(req(`Bearer ${KEY}`), 'Claude');
-    expect(out).toEqual({ ok: false, status: 403, message: 'Switch back to Rimba Ventures in OpenKuasa, or connect again for Kopi Co.' });
+    expect(out).toEqual({ ok: false, status: 403, message: 'Switch back to Rimba Ventures in KuasabyRickworks, or connect again for Kopi Co.' });
 
     // OAuth: allowed in A, then the person switches to B.
     db.profiles.set(ALICE, ORG_A);
@@ -301,7 +301,7 @@ describe('resolveCaller', () => {
       ok: false,
       status: 403,
       message:
-        'This connection works in Rimba Ventures. Switch back to Rimba Ventures in OpenKuasa, or disconnect it in Account → Developers and connect again for Kopi Co.',
+        'This connection works in Rimba Ventures. Switch back to Rimba Ventures in KuasabyRickworks, or disconnect it in Account → Developers and connect again for Kopi Co.',
     });
     // A new token from the same client keeps the binding: it is the same connection.
     expect(await resolveCaller(req(`Bearer ${oauthToken(ALICE)}`), 'Claude')).toMatchObject({ ok: false, status: 403 });
@@ -314,7 +314,7 @@ describe('resolveCaller', () => {
     join(ORG_C, ALICE, 'member', '2026-03-01');
     db.profiles.set(ALICE, ORG_C);
     const out = await resolveCaller(req(`Bearer ${KEY}`), 'Claude');
-    expect(out).toEqual({ ok: false, status: 403, message: 'Switch back to Rimba Ventures in OpenKuasa, or connect again for your other workspace.' });
+    expect(out).toEqual({ ok: false, status: 403, message: 'Switch back to Rimba Ventures in KuasabyRickworks, or connect again for your other workspace.' });
   });
 
   test('nothing recorded: the earliest membership is the current workspace, as in the app', async () => {
@@ -351,7 +351,7 @@ describe('resolveCaller', () => {
     expect(await resolveCaller(req(`Bearer ${KEY}`), 'Claude')).toEqual({
       ok: false,
       status: 403,
-      message: 'Switch back to Rimba Ventures in OpenKuasa, or connect again for Kopi Co.',
+      message: 'Switch back to Rimba Ventures in KuasabyRickworks, or connect again for Kopi Co.',
     });
 
     // An OAuth connection bound to A is refused the same way; one bound to B works.
@@ -360,7 +360,7 @@ describe('resolveCaller', () => {
       ok: false,
       status: 403,
       message:
-        'This connection works in Rimba Ventures. Switch back to Rimba Ventures in OpenKuasa, or disconnect it in Account → Developers and connect again for Kopi Co.',
+        'This connection works in Rimba Ventures. Switch back to Rimba Ventures in KuasabyRickworks, or disconnect it in Account → Developers and connect again for Kopi Co.',
     });
     bind(ALICE, 'cursor', ORG_B);
     const token = oauthToken(ALICE, { client_id: 'cursor' });
@@ -600,7 +600,7 @@ describe('resolveCaller', () => {
     keyResolvesTo(ALICE, ORG_A, 'alice-at-1');
     expect(await resolveCaller(req(`Bearer ${KEY}`), 'Claude')).toMatchObject({ ok: true, caller: { orgId: ORG_A } });
     // No bearer at all still asks to sign in or use a key.
-    expect(await resolveCaller(req(), 'Claude')).toEqual({ ok: false, status: 401, message: 'Sign in to OpenKuasa or use an API key.' });
+    expect(await resolveCaller(req(), 'Claude')).toEqual({ ok: false, status: 401, message: 'Sign in to KuasabyRickworks or use an API key.' });
 
     // Switched on: the OAuth token is checked and acts as before.
     vi.stubEnv('MCP_SIGN_IN_ENABLED', 'true');
@@ -608,7 +608,7 @@ describe('resolveCaller', () => {
   });
 
   test('no or bad bearer gives 401', async () => {
-    const expected = { ok: false, status: 401, message: 'Sign in to OpenKuasa or use an API key.' };
+    const expected = { ok: false, status: 401, message: 'Sign in to KuasabyRickworks or use an API key.' };
     expect(await resolveCaller(req(), 'Claude')).toEqual(expected);
     expect(await resolveCaller(req('Basic abc'), 'Claude')).toEqual(expected);
     expect(await resolveCaller(req('Bearer '), 'Claude')).toEqual(expected);

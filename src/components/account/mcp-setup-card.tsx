@@ -75,7 +75,7 @@ export function McpSetupCard({ serverUrl, signIn = true }: { serverUrl: string; 
   return (
     <BentoCard
       title="Set up"
-      subtitle="Connect an AI tool to OpenKuasa"
+      subtitle="Connect an AI tool to KuasabyRickworks"
       icon={Workflow}
       className="col-span-2 md:col-span-12"
     >
@@ -90,7 +90,7 @@ export function McpSetupCard({ serverUrl, signIn = true }: { serverUrl: string; 
           {signIn ? (
             <p className="text-muted-foreground">
               No key needed. In Settings → Connectors, choose Add custom connector, paste the server address, then sign
-              in with OpenKuasa and allow it for this workspace.
+              in with KuasabyRickworks and allow it for this workspace.
             </p>
           ) : (
             <p className="text-muted-foreground">Coming soon.</p>

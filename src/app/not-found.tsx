@@ -7,7 +7,7 @@ export default function NotFound() {
     <div className="flex min-h-dvh flex-col bg-background">
       <header className="border-b">
         <div className="mx-auto max-w-5xl px-6 py-4">
-          <Link href="/" aria-label="OpenKuasa home">
+          <Link href="/" aria-label="KuasabyRickworks home">
             <Logo />
           </Link>
         </div>

@@ -133,7 +133,7 @@ describe('the service worker', () => {
     await push(undefined);
     await push('{not json');
     expect(shown).toHaveLength(2);
-    expect(shown[0].title).toBe('OpenKuasa');
+    expect(shown[0].title).toBe('KuasabyRickworks');
     expect(shown[1].options.data).toEqual({ url: '/command' });
   });
 

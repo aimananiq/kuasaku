@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 /**
- * "Sign in with OpenKuasa": the consent screen Supabase's OAuth server sends people to, its Allow and Don't allow
+ * "Sign in with KuasabyRickworks": the consent screen Supabase's OAuth server sends people to, its Allow and Don't allow
  * actions, and the sign-in page bringing people back to it. The auth server, the database and the request scope are
  * stand-ins; nothing here reaches the network.
  */
@@ -194,9 +194,9 @@ describe('consent page', () => {
     session();
     const html = await renderPage();
     const shown = text(html);
-    expect(shown).toContain('Allow “Claude” to sign in to OpenKuasa as smoke?');
+    expect(shown).toContain('Allow “Claude” to sign in to KuasabyRickworks as smoke?');
     expect(shown).toContain(
-      'It will be able to do anything you can do in OpenKuasa, as you, until you disconnect it in Account → Developers.',
+      'It will be able to do anything you can do in KuasabyRickworks, as you, until you disconnect it in Account → Developers.',
     );
     expect(shown).toContain('Its AI tool works in Rimba Ventures.');
     expect(shown).toContain('Only allow this if you just started connecting an AI tool yourself.');
@@ -218,7 +218,7 @@ describe('consent page', () => {
 
   test('the person is named by their profile name when they set one', async () => {
     session({ fullName: 'Siti Aminah' });
-    expect(text(await renderPage())).toContain('Allow “Claude” to sign in to OpenKuasa as Siti Aminah?');
+    expect(text(await renderPage())).toContain('Allow “Claude” to sign in to KuasabyRickworks as Siti Aminah?');
   });
 
   test('names the workspace the person has open', async () => {
@@ -233,7 +233,7 @@ describe('consent page', () => {
     calls = [];
     session({ details: { ...details, data: { ...(details.data as object), redirect_uri: 'urn:ietf:wg:oauth:2.0:oob' } } });
     const shown = text(await renderPage());
-    expect(shown).toContain('Allow “Claude” to sign in to OpenKuasa as smoke?');
+    expect(shown).toContain('Allow “Claude” to sign in to KuasabyRickworks as smoke?');
     expect(shown).not.toContain('Sends you back to');
   });
 
@@ -280,7 +280,7 @@ describe('consent page', () => {
   test('demo guests cannot connect', async () => {
     session({ user: { id: ALICE, email: '', is_anonymous: true } });
     const shown = text(await renderPage());
-    expect(shown).toContain("The demo can't connect to AI tools. Sign in with your own OpenKuasa account.");
+    expect(shown).toContain("The demo can't connect to AI tools. Sign in with your own KuasabyRickworks account.");
     expect(shown).not.toContain('Allow “Claude”');
     expect(calls).toEqual([]);
   });
@@ -289,7 +289,7 @@ describe('consent page', () => {
     session();
     mocks.currentOrgFor.mockResolvedValue(null);
     const shown = text(await renderPage());
-    expect(shown).toContain('Open a workspace in OpenKuasa first, then connect again from your AI tool.');
+    expect(shown).toContain('Open a workspace in KuasabyRickworks first, then connect again from your AI tool.');
     expect(shown).not.toContain('Allow “Claude”');
   });
 });
@@ -325,7 +325,7 @@ describe('with sign-in switched off', () => {
   test('switched on, the screen asks as before', async () => {
     vi.stubEnv('MCP_SIGN_IN_ENABLED', 'true');
     session();
-    expect(text(await renderPage())).toContain('Allow “Claude” to sign in to OpenKuasa as smoke?');
+    expect(text(await renderPage())).toContain('Allow “Claude” to sign in to KuasabyRickworks as smoke?');
   });
 });
 
@@ -409,7 +409,7 @@ describe('consent actions', () => {
     mocks.getMfaStatus.mockResolvedValue({ verified: false, challengeRequired: false, factors: [], pendingFactors: [] });
     session({ user: { id: ALICE, email: '', is_anonymous: true } });
     expect(await allowAction(undefined, allowForm())).toEqual({
-      error: "The demo can't connect to AI tools. Sign in with your own OpenKuasa account.",
+      error: "The demo can't connect to AI tools. Sign in with your own KuasabyRickworks account.",
     });
     expect(calls).toEqual([]);
   });
@@ -425,7 +425,7 @@ describe('consent actions', () => {
     mocks.getMfaStatus.mockResolvedValue({ verified: false, challengeRequired: false, factors: [], pendingFactors: [] });
     session({ user: { id: ALICE, email: '', is_anonymous: true } });
     expect(await denyAction(undefined, form({ authorization_id: AUTH_ID }))).toEqual({
-      error: "The demo can't connect to AI tools. Sign in with your own OpenKuasa account.",
+      error: "The demo can't connect to AI tools. Sign in with your own KuasabyRickworks account.",
     });
     expect(calls).toEqual([]);
   });
