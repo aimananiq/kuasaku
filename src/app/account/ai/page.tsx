@@ -4,7 +4,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { AiKeyForm, RemoveAiKeyForm } from '@/components/account/ai-key-form';
+import { AiKeyForm, SavedAiKeyRow } from '@/components/account/ai-key-form';
+import { isAiProvider, type AiProvider } from '@/lib/ai/providers';
 import { ReadOnlyNotice } from '@/components/account/settings-form';
 import { getChatStatus } from '@/lib/ai/gate';
 import { hasKeySecret } from '@/lib/ai/key-crypto';
@@ -18,13 +19,25 @@ export default async function AiKeyPage() {
   const live = hasSupabaseEnv() && !viewer.isDemo;
   const status = live ? await getChatStatus(await createClient()) : null;
   const canManage = live && can(viewer.role, 'manage-ai-key');
+  const { data: keyRows } = live
+    ? await (await createClient()).rpc('org_ai_keys_list')
+    : { data: null };
+  const savedKeys = ((keyRows ?? []) as {
+    provider: string;
+    key_hint: string;
+    is_active: boolean;
+  }[]).flatMap((r) =>
+    isAiProvider(r.provider)
+      ? [{ provider: r.provider as AiProvider, hint: r.key_hint, active: r.is_active }]
+      : [],
+  );
 
   return (
     <div className="mx-auto w-full max-w-3xl px-6 py-8">
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight">AI key</h1>
         <p className="text-sm text-muted-foreground">
-          Chat runs on your own OpenRouter account.
+          Chat and the agents run on your own AI account.
         </p>
       </div>
 
@@ -35,9 +48,12 @@ export default async function AiKeyPage() {
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p>
-              Add one OpenRouter key for {viewer.orgName} and everyone in the
-              workspace chats on it, billed to your OpenRouter account. Set a
-              spending limit on the key in OpenRouter.
+              Add a key for {viewer.orgName} from OpenRouter, OpenAI,
+              Anthropic (Claude), Google (Gemini), DeepSeek, xAI (Grok),
+              Mistral, Groq, Together AI, Moonshot (Kimi) or Alibaba Qwen, and everyone in the workspace
+              chats on it, billed to your account with that provider. You can
+              save a key for each provider and choose which one is in use. Set a
+              spending limit on the key with the provider.
             </p>
             <p>
               {`As a safety net, each person can send up to ${WORKSPACE_KEY_TURNS_PER_DAY} chat requests a day on the key.`}{' '}
@@ -49,16 +65,8 @@ export default async function AiKeyPage() {
               assistants.
             </p>
             <p>
-              Create a key at{' '}
-              <a
-                href="https://openrouter.ai/keys"
-                target="_blank"
-                rel="noreferrer"
-                className="font-medium text-primary hover:underline"
-              >
-                openrouter.ai/keys
-              </a>
-              .
+              Reading receipts, and the agents&apos; images and video, use
+              OpenRouter. They need an OpenRouter key in use.
             </p>
           </CardContent>
         </Card>
@@ -75,21 +83,26 @@ export default async function AiKeyPage() {
               </ReadOnlyNotice>
             ) : (
               <>
-                <div className="flex items-center justify-between gap-4">
+                {savedKeys.length > 0 ? (
+                  <div className="space-y-4">
+                    {savedKeys.map((k) => (
+                      <SavedAiKeyRow
+                        key={k.provider}
+                        provider={k.provider}
+                        hint={k.hint}
+                        active={k.active}
+                        canManage={canManage}
+                      />
+                    ))}
+                  </div>
+                ) : (
                   <div>
-                    <p className="font-medium">
-                      {status.hasKey ? status.keyHint : 'No key added'}
-                    </p>
+                    <p className="font-medium">No key added</p>
                     <p className="text-sm text-muted-foreground">
-                      {status.hasKey
-                        ? 'Chat is running on your OpenRouter account.'
-                        : `You have ${status.freeRemaining} of ${status.freeLimit} free questions left this week.`}
+                      {`You have ${status.freeRemaining} of ${status.freeLimit} free questions left this week.`}
                     </p>
                   </div>
-                  <span className="inline-flex shrink-0 items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-                    {status.hasKey ? 'Active' : 'Not set'}
-                  </span>
-                </div>
+                )}
 
                 {!canManage ? (
                   <ReadOnlyNotice>
@@ -102,8 +115,12 @@ export default async function AiKeyPage() {
                   </ReadOnlyNotice>
                 ) : (
                   <>
-                    <AiKeyForm hasKey={status.hasKey} />
-                    {status.hasKey ? <RemoveAiKeyForm /> : null}
+                    <div className="border-t pt-5">
+                      <p className="mb-3 text-sm font-medium">
+                        {status.hasKey ? 'Add or replace a key' : 'Add a key'}
+                      </p>
+                      <AiKeyForm hasKey={status.hasKey} />
+                    </div>
                   </>
                 )}
               </>

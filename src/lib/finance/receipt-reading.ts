@@ -31,6 +31,8 @@ export const RECEIPT_READING_MESSAGES = {
     'Receipts are read on your workspace’s own AI key, and it has none yet. The free chat questions are not used for receipts. An owner or admin can add a key under Account.',
   // A key is stored and this server cannot open it, or it could not be read.
   keyUnusable: 'This receipt was not sent: your workspace’s AI key could not be used on this server. Ask an owner to save it again.',
+  // The active key is not an OpenRouter key; reading a receipt needs OpenRouter's file handling.
+  needsOpenRouter: 'This receipt was not sent: reading receipts needs an OpenRouter key. In AI key settings, add an OpenRouter key and make it the active one.',
   // Whether the workspace has a key could not be asked.
   keyUnknown: 'This receipt was not sent: your workspace’s AI key could not be checked. Please try again.',
   // The provider refused the key (401).

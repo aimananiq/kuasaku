@@ -28,7 +28,7 @@ const ctl = vi.hoisted(() => ({
   modelId: 'vendor/reader:free' as string | null,
   receipt: null as unknown,
   keyState: 'set' as 'set' | 'none' | 'unknown',
-  stored: { status: 'ok', apiKey: '' } as { status: string; apiKey?: string },
+  stored: { status: 'ok', apiKey: '', provider: 'openrouter' } as { status: string; apiKey?: string; provider?: string },
   link: { ok: true, data: { url: 'https://store.example/signed' } } as unknown,
   bytes: null as Uint8Array | null,
   categories: [] as { id: string; name: string }[] | Error,
@@ -146,7 +146,7 @@ beforeEach(() => {
   ctl.modelId = 'vendor/reader:free';
   ctl.receipt = { ok: true, data: { status: 'review', file: { path: PATH, type: 'image/jpeg' }, details: { ...TYPED }, extractedAt: null } };
   ctl.keyState = 'set';
-  ctl.stored = { status: 'ok', apiKey: WORKSPACE_KEY };
+  ctl.stored = { status: 'ok', apiKey: WORKSPACE_KEY, provider: 'openrouter' };
   ctl.link = { ok: true, data: { url: 'https://store.example/signed' } };
   ctl.bytes = JPG;
   ctl.categories = CATEGORIES;

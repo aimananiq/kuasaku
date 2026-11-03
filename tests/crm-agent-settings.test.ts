@@ -61,7 +61,7 @@ function fake(opts: {
   return { client, log };
 }
 
-const okKey = () => vi.mocked(readWorkspaceKey).mockResolvedValue({ status: 'ok', apiKey: 'k' });
+const okKey = () => vi.mocked(readWorkspaceKey).mockResolvedValue({ status: 'ok', apiKey: 'k', provider: 'openrouter' });
 const okInterpret = vi.fn(async () => ({
   plan: { checks: [{ key: 'follow_up_overdue', params: {} }] },
   cannot: ['Send emails'],

@@ -89,7 +89,7 @@ test('a workspace without a stored key has none', async () => {
 
 test('a key sealed for the workspace opens and is left as stored', async () => {
   const { client, updates } = fakeService({ rows: { [ORG_A]: encryptApiKey(key, ORG_A) } });
-  expect(await readWorkspaceKey(client, ORG_A)).toEqual({ status: 'ok', apiKey: key });
+  expect(await readWorkspaceKey(client, ORG_A)).toEqual({ status: 'ok', apiKey: key, provider: 'openrouter' });
   expect(updates).toHaveLength(0);
 });
 
@@ -104,7 +104,7 @@ test('a key in the earlier format opens once and is stored again bound to its wo
   const rows = { [ORG_A]: legacy };
   const { client, updates } = fakeService({ rows });
 
-  expect(await readWorkspaceKey(client, ORG_A)).toEqual({ status: 'ok', apiKey: key });
+  expect(await readWorkspaceKey(client, ORG_A)).toEqual({ status: 'ok', apiKey: key, provider: 'openrouter' });
 
   expect(updates).toHaveLength(1);
   // Only the row that still holds the value that was read is replaced.
@@ -116,7 +116,7 @@ test('a key in the earlier format opens once and is stored again bound to its wo
   expect(decryptApiKey(rows[ORG_A], ORG_B)).toBeNull();
 
   // The next read finds the bound value and writes nothing.
-  expect(await readWorkspaceKey(client, ORG_A)).toEqual({ status: 'ok', apiKey: key });
+  expect(await readWorkspaceKey(client, ORG_A)).toEqual({ status: 'ok', apiKey: key, provider: 'openrouter' });
   expect(updates).toHaveLength(1);
 });
 
@@ -124,7 +124,7 @@ test('the key is still usable when storing it again fails', async () => {
   const legacy = sealV1(key);
   const rows = { [ORG_A]: legacy };
   const { client, updates } = fakeService({ rows, writeError: true });
-  expect(await readWorkspaceKey(client, ORG_A)).toEqual({ status: 'ok', apiKey: key });
+  expect(await readWorkspaceKey(client, ORG_A)).toEqual({ status: 'ok', apiKey: key, provider: 'openrouter' });
   expect(updates).toHaveLength(1);
   expect(rows[ORG_A]).toBe(legacy);
 });

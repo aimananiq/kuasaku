@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Logo } from '@/components/brand/logo';
 import { DemoButton } from '@/components/auth/demo-button';
-import { GoogleNotEnabledButton } from '@/components/auth/google-not-enabled-button';
+import { GoogleSignInButton } from '@/components/auth/google-sign-in-button';
 import { LoginForm } from '@/components/auth/login-form';
 import { signInReturnPath } from '@/lib/security/safe-path';
 
@@ -52,10 +52,10 @@ export default async function LoginPage({
               </p>
             ) : null}
 
-            <GoogleNotEnabledButton>
+            <GoogleSignInButton>
               <GoogleMark />
               Sign in with Google
-            </GoogleNotEnabledButton>
+            </GoogleSignInButton>
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">

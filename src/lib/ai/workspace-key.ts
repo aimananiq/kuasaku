@@ -1,5 +1,5 @@
 /**
- * Reads and opens a workspace's stored OpenRouter key on the server.
+ * Reads and opens a workspace's active AI key (OpenRouter, OpenAI, Anthropic or Google) on the server.
  *
  * The sealed value never leaves the server: it is read with the service-role
  * client, by a workspace id the caller has already resolved from trusted
@@ -9,11 +9,12 @@
 import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { decryptApiKey, encryptApiKey, hasKeySecret } from '@/lib/ai/key-crypto';
+import { detectProvider, encodeKeyRef, isAiProvider, type AiProvider } from '@/lib/ai/providers';
 
 export type WorkspaceKey =
   /** The workspace has not stored a key. */
   | { status: 'none' }
-  | { status: 'ok'; apiKey: string }
+  | { status: 'ok'; apiKey: string; provider: AiProvider }
   /** A key is stored but this server cannot open it for this workspace. */
   | { status: 'unusable' }
   /** The stored key could not be read. */
@@ -34,8 +35,9 @@ export async function readWorkspaceKey(
 ): Promise<WorkspaceKey> {
   const { data, error } = await service
     .from('org_ai_keys')
-    .select('ciphertext')
+    .select('ciphertext, provider')
     .eq('org_id', orgId)
+    .eq('is_active', true)
     .maybeSingle();
   if (error) return { status: 'error' };
 
@@ -46,7 +48,9 @@ export async function readWorkspaceKey(
   if (!apiKey) return { status: 'unusable' };
 
   if (isLegacy(sealed)) await resealForWorkspace(service, orgId, sealed, apiKey);
-  return { status: 'ok', apiKey };
+  const provider: AiProvider = isAiProvider(data?.provider) ? data.provider : (detectProvider(apiKey) ?? 'openrouter');
+  // `apiKey` carries its provider (see encodeKeyRef): the bare key for the four providers whose keys name them.
+  return { status: 'ok', apiKey: encodeKeyRef(provider, apiKey), provider };
 }
 
 /**
@@ -67,6 +71,7 @@ async function resealForWorkspace(
       .from('org_ai_keys')
       .update({ ciphertext: encryptApiKey(apiKey, orgId) })
       .eq('org_id', orgId)
+      .eq('is_active', true)
       .eq('ciphertext', legacySealed);
     if (error) console.error('[ai-key] could not re-seal a workspace key:', error.message);
   } catch {

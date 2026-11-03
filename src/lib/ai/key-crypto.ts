@@ -12,6 +12,7 @@
  * current workspace, or the schedule/run row), never from client input.
  */
 
+import { detectProvider, hintFor, isKeyShapeFor } from '@/lib/ai/providers';
 import 'server-only';
 import {
   createCipheriv,
@@ -134,10 +135,10 @@ export function decryptApiKey(
 
 /** OpenRouter keys look like `sk-or-v1-…`; a cheap check before any network call. */
 export function isOpenRouterKeyShape(input: string): boolean {
-  return /^sk-or-[A-Za-z0-9_-]{16,300}$/.test(input.trim());
+  return isKeyShapeFor('openrouter', input);
 }
 
-/** What we show back to people: never more than the last four characters. */
+/** What is shown about a saved key: its start and its last four characters. */
 export function keyHint(apiKey: string): string {
-  return `sk-or-…${apiKey.trim().slice(-4)}`;
+  return hintFor(detectProvider(apiKey) ?? 'openrouter', apiKey);
 }

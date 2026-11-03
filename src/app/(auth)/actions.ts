@@ -136,6 +136,12 @@ export async function signUpAction(
     // Which of the two the auth server reports depends on whether the project
     // has email confirmation on.
     if (signUpErr && !ADDRESS_TAKEN_CODES.has(signUpErr.code ?? '')) {
+      if (signUpErr.code === 'over_email_send_rate_limit') {
+        return {
+          error: 'Too many sign-up emails were sent just now. Please wait a while and try again.',
+          values,
+        };
+      }
       return { error: 'Could not sign up right now. Please try again.', values };
     }
     if (signUpErr || !data.session) {
@@ -155,6 +161,67 @@ export async function signUpAction(
     target: parsed.data.orgName,
   });
 
+  redirect('/command');
+}
+
+export async function googleSignInAction(): Promise<AuthState> {
+  // The project owner switches Google on in Supabase (Authentication → Providers).
+  // Ask the auth server first, so a project without it says so here instead of
+  // sending the person to an error page.
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!base || !key) return { error: 'Google sign-in is not available right now.' };
+  try {
+    const res = await fetch(`${base}/auth/v1/settings`, {
+      headers: { apikey: key },
+      cache: 'no-store',
+    });
+    const settings = (await res.json()) as { external?: { google?: boolean } };
+    if (!settings.external?.google) {
+      return { error: "Google sign-in isn't enabled yet." };
+    }
+  } catch {
+    return { error: 'Google sign-in is not available right now.' };
+  }
+
+  await setRememberCookie(true);
+  const supabase = await createClient({ remember: true });
+  const origin = await requestOrigin();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    // /auth/confirm swaps the code for a session. A new person has no workspace
+    // yet, so /command sends them on to /onboarding to name one.
+    options: { redirectTo: `${origin}/auth/confirm?next=/command` },
+  });
+  if (error || !data.url) {
+    return { error: 'Google sign-in is not available right now.' };
+  }
+  redirect(data.url);
+}
+
+/** For a person already signed in (for example with Google) who has no workspace yet. */
+export async function createWorkspaceAction(
+  _prev: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const orgName = String(formData.get('orgName') ?? '').trim();
+  const values = { orgName };
+  const parsed = workspaceNameSchema.safeParse(orgName);
+  if (!parsed.success) return { error: parsed.error.issues[0].message, values };
+
+  const supabase = await createClient({ remember: true });
+  const { data } = await supabase.auth.getUser();
+  if (!data.user || data.user.is_anonymous) redirect('/login');
+
+  const { error: orgErr } = await supabase.rpc('create_org_for_current_user', {
+    org_name: parsed.data,
+  });
+  if (orgErr) return { error: createWorkspaceError(orgErr), values };
+  await recordEvent(supabase, {
+    action: 'Created the workspace',
+    category: 'team',
+    target: parsed.data,
+  });
   redirect('/command');
 }
 

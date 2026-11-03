@@ -35,8 +35,8 @@ vi.mock('@/lib/supabase/service', () => ({
         select: () => {
           let org = '';
           const b = {
-            eq(_c: string, v: string) {
-              org = v;
+            eq(c: string, v: string) {
+              if (c === 'org_id') org = v;
               return b;
             },
             maybeSingle: async () => ({

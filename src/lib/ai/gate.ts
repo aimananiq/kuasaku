@@ -107,7 +107,7 @@ export async function resolveChatAccess(
   const needsKey = locked(
     402,
     'key_required',
-    'Add your OpenRouter key to keep chatting.',
+    'Add an AI key to keep chatting.',
   );
   if (!hasProviderKey()) return needsKey;
 

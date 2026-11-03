@@ -361,7 +361,8 @@ export async function pollVideos(client: SupabaseClient): Promise<void> {
     if (keys.has(orgId)) return keys.get(orgId) ?? null;
     // `orgId` is the asset row's own workspace; the key opens only for it.
     const stored = await readWorkspaceKey(client, orgId);
-    const key = stored.status === 'ok' ? stored.apiKey : null;
+    // Video jobs run on OpenRouter, so another provider's key cannot poll them.
+    const key = stored.status === 'ok' && stored.provider === 'openrouter' ? stored.apiKey : null;
     keys.set(orgId, key);
     return key;
   };

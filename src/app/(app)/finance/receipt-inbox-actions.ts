@@ -269,6 +269,8 @@ export async function readReceiptAction(input: unknown): Promise<FinResult<Recei
     const stored = await readWorkspaceKey(serviceClient(), viewer.orgId);
     // A key is known to be set, so finding none here is a mismatch to refuse, never a reason to use another key.
     if (stored.status !== 'ok') return refused(R.keyUnusable);
+    // Reading a receipt uses OpenRouter's own file handling, so another provider's key cannot do it.
+    if (stored.provider !== 'openrouter') return refused(R.needsOpenRouter);
     model = getWorkspaceModelById(modelId, stored.apiKey);
   } catch {
     // No service key on this server.

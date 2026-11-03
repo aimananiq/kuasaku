@@ -11,6 +11,10 @@
 
 import 'server-only';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
+import { createOpenAI } from '@ai-sdk/openai';
+import { createAnthropic } from '@ai-sdk/anthropic';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { decodeKeyRef, type AiProvider } from '@/lib/ai/providers';
 import type { LanguageModel } from 'ai';
 
 export type AgentLayer = 'orchestrator' | 'worker';
@@ -72,14 +76,94 @@ function getPlatformProvider() {
   return platformProvider;
 }
 
+/** Providers reached through an OpenAI-compatible endpoint: where it is, and the default model per layer. */
+const COMPATIBLE: Record<
+  'deepseek' | 'xai' | 'mistral' | 'groq' | 'together' | 'moonshot' | 'qwen',
+  { baseURL: string; models: Record<AgentLayer, string> }
+> = {
+  deepseek: { baseURL: 'https://api.deepseek.com/v1', models: { orchestrator: 'deepseek-chat', worker: 'deepseek-chat' } },
+  xai: { baseURL: 'https://api.x.ai/v1', models: { orchestrator: 'grok-4', worker: 'grok-3-mini' } },
+  mistral: {
+    baseURL: 'https://api.mistral.ai/v1',
+    models: { orchestrator: 'mistral-large-latest', worker: 'mistral-small-latest' },
+  },
+  groq: {
+    baseURL: 'https://api.groq.com/openai/v1',
+    models: { orchestrator: 'llama-3.3-70b-versatile', worker: 'llama-3.1-8b-instant' },
+  },
+  together: {
+    baseURL: 'https://api.together.xyz/v1',
+    models: {
+      orchestrator: 'meta-llama/Llama-3.3-70B-Instruct-Turbo',
+      worker: 'meta-llama/Llama-3.1-8B-Instruct-Turbo',
+    },
+  },
+  moonshot: {
+    baseURL: 'https://api.moonshot.ai/v1',
+    models: { orchestrator: 'kimi-k2-0905-preview', worker: 'kimi-k2-0905-preview' },
+  },
+  qwen: {
+    baseURL: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+    models: { orchestrator: 'qwen-max', worker: 'qwen-turbo' },
+  },
+};
+
+/** The OpenAI-compatible endpoint of a provider that has one, else null. */
+export function compatibleBaseURL(provider: AiProvider): string | null {
+  return provider in COMPATIBLE ? COMPATIBLE[provider as keyof typeof COMPATIBLE].baseURL : null;
+}
+
+/** Default model ids for a workspace's own key on each provider other than OpenRouter (whose ids are in FALLBACK_MODEL). */
+const DIRECT_MODEL: Record<'anthropic' | 'openai' | 'google', Record<AgentLayer, string>> = {
+  anthropic: { orchestrator: 'claude-sonnet-5-5', worker: 'claude-haiku-5-5' },
+  openai: { orchestrator: 'gpt-4.1', worker: 'gpt-4.1-mini' },
+  google: { orchestrator: 'gemini-2.5-pro', worker: 'gemini-2.5-flash' },
+};
+
+/** The model id for a layer on a provider other than OpenRouter; `OPENKUASA_MODEL_<PROVIDER>_<LAYER>` overrides it. */
+export function pickDirectModelId(
+  provider: Exclude<AiProvider, 'openrouter'>,
+  layer: AgentLayer,
+  env: EnvLike = process.env,
+): string {
+  const fromEnv = env[`OPENKUASA_MODEL_${provider.toUpperCase()}_${layer.toUpperCase()}`];
+  if (fromEnv?.trim()) return fromEnv.trim();
+  return provider in COMPATIBLE
+    ? COMPATIBLE[provider as keyof typeof COMPATIBLE].models[layer]
+    : DIRECT_MODEL[provider as keyof typeof DIRECT_MODEL][layer];
+}
+
 /**
  * The model for a given agent layer. Pass a workspace's own key to bill that
- * workspace (bring-your-own-key); omit it to use the platform key.
+ * workspace (bring-your-own-key); omit it to use the platform key. `apiKey` is
+ * a key as `readWorkspaceKey` returns it (see `encodeKeyRef`), which carries
+ * its provider: OpenRouter, Anthropic, OpenAI, Google or an OpenAI-compatible
+ * one such as DeepSeek.
  */
-export function getModel(layer: AgentLayer, apiKey?: string): LanguageModel {
+export function getModel(layer: AgentLayer, keyRef?: string): LanguageModel {
+  if (!keyRef) return inSession(getPlatformProvider(), pickModelId(layer));
   // A workspace provider is built per request so keys are never cached.
-  const provider = apiKey ? createProvider(apiKey) : getPlatformProvider();
-  return inSession(provider, pickModelId(layer));
+  const { provider, apiKey } = decodeKeyRef(keyRef);
+  switch (provider) {
+    case 'anthropic':
+      return createAnthropic({ apiKey })(pickDirectModelId('anthropic', layer));
+    case 'openai':
+      return createOpenAI({ apiKey })(pickDirectModelId('openai', layer));
+    case 'google':
+      return createGoogleGenerativeAI({ apiKey })(pickDirectModelId('google', layer));
+    case 'deepseek':
+    case 'xai':
+    case 'mistral':
+    case 'groq':
+    case 'together':
+    case 'moonshot':
+    case 'qwen':
+      return createOpenAI({ apiKey, baseURL: COMPATIBLE[provider].baseURL }).chat(
+        pickDirectModelId(provider, layer),
+      );
+    default:
+      return inSession(createProvider(apiKey), pickModelId(layer));
+  }
 }
 
 /**

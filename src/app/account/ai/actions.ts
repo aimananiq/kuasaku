@@ -1,44 +1,66 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { serviceClient } from '@/lib/supabase/service';
 import { getViewer, type Viewer } from '@/lib/auth/viewer';
 import { can } from '@/lib/auth/permissions';
+import { encryptApiKey, hasKeySecret } from '@/lib/ai/key-crypto';
 import {
-  encryptApiKey,
-  hasKeySecret,
-  isOpenRouterKeyShape,
-  keyHint,
-} from '@/lib/ai/key-crypto';
+  PROVIDER_INFO,
+  hintFor,
+  isAiProvider,
+  isKeyShapeFor,
+  type AiProvider,
+} from '@/lib/ai/providers';
+import { compatibleBaseURL } from '@/lib/ai/provider';
 import { getChatStatus, type ChatStatus } from '@/lib/ai/gate';
 import type { SettingsState } from '@/app/account/actions';
 
 const DEMO_ERROR = 'The demo workspace is read-only. Sign up to save changes.';
 const ROLE_ERROR = 'Only owners and admins can manage the workspace AI key.';
 const SAVE_ERROR = 'Could not save the key. Please try again.';
-const KEY_CHECK_URL ='https://openrouter.ai/api/v1/key';
 
-const keySchema = z
-  .string()
-  .trim()
-  .refine(isOpenRouterKeyShape, 'That does not look like an OpenRouter key. It should start with sk-or-.');
+/** How each provider is asked whether a key is real: a free call that lists models. */
+function checkRequest(provider: AiProvider, apiKey: string): { url: string; headers: Record<string, string> } {
+  switch (provider) {
+    case 'openai':
+      return { url: 'https://api.openai.com/v1/models', headers: { Authorization: `Bearer ${apiKey}` } };
+    case 'anthropic':
+      return {
+        url: 'https://api.anthropic.com/v1/models?limit=1',
+        headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+      };
+    case 'google':
+      return {
+        url: 'https://generativelanguage.googleapis.com/v1beta/models?pageSize=1',
+        headers: { 'x-goog-api-key': apiKey },
+      };
+    case 'openrouter':
+      return { url: 'https://openrouter.ai/api/v1/key', headers: { Authorization: `Bearer ${apiKey}` } };
+    default:
+      // An OpenAI-compatible provider: listing its models needs a valid key.
+      return { url: `${compatibleBaseURL(provider)}/models`, headers: { Authorization: `Bearer ${apiKey}` } };
+  }
+}
 
-/** Asks OpenRouter whether the key is real. Never logs the key. */
-async function checkWithOpenRouter(
+/** Asks the provider whether the key is real. Never logs the key. */
+async function checkWithProvider(
+  provider: AiProvider,
   apiKey: string,
 ): Promise<'valid' | 'invalid' | 'unreachable'> {
   try {
-    const response = await fetch(KEY_CHECK_URL, {
-      headers: { Authorization: `Bearer ${apiKey}` },
+    const { url, headers } = checkRequest(provider, apiKey);
+    const response = await fetch(url, {
+      headers,
       cache: 'no-store',
       signal: AbortSignal.timeout(8000),
     });
     if (response.ok) return 'valid';
-    return response.status === 401 || response.status === 403
-      ? 'invalid'
-      : 'unreachable';
+    // Google answers a bad key with 400.
+    const rejected =
+      response.status === 401 || response.status === 403 || (provider === 'google' && response.status === 400);
+    return rejected ? 'invalid' : 'unreachable';
   } catch {
     return 'unreachable';
   }
@@ -65,9 +87,14 @@ export async function saveAiKeyAction(
   if ('denied' in manager) return { error: manager.denied };
   const { viewer } = manager;
 
-  const parsed = keySchema.safeParse(String(formData.get('apiKey') ?? ''));
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
-  const apiKey = parsed.data;
+  const provider = formData.get('provider');
+  if (!isAiProvider(provider)) return { error: 'Choose an AI provider.' };
+  const info = PROVIDER_INFO[provider];
+  const apiKey = String(formData.get('apiKey') ?? '').trim();
+  if (!isKeyShapeFor(provider, apiKey)) {
+    return { error: `That does not look like a ${info.label} key. ${info.shapeHint}` };
+  }
+  const makeActive = formData.get('makeActive') === 'on';
 
   if (!hasKeySecret()) {
     return {
@@ -76,12 +103,20 @@ export async function saveAiKeyAction(
     };
   }
 
-  const check = await checkWithOpenRouter(apiKey);
+  // Saving seals and stores the key with the service role; say so when this host has none.
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()) {
+    return {
+      error:
+        'This server cannot save keys yet: SUPABASE_SERVICE_ROLE_KEY is missing. The host sets it in .env.local (Supabase → Project Settings → API → service_role).',
+    };
+  }
+
+  const check = await checkWithProvider(provider, apiKey);
   if (check === 'invalid') {
-    return { error: 'OpenRouter rejected that key. Check it and try again.' };
+    return { error: `${info.label} rejected that key. Check it and try again.` };
   }
   if (check === 'unreachable') {
-    return { error: 'Could not reach OpenRouter to check the key. Please try again.' };
+    return { error: `Could not reach ${info.label} to check the key. Please try again.` };
   }
 
   // The server is the only writer of a sealed key. It seals for the workspace
@@ -93,33 +128,63 @@ export async function saveAiKeyAction(
     const { error } = await serviceClient().rpc('set_org_ai_key', {
       p_org: viewer.orgId,
       p_actor: viewer.userId,
+      p_provider: provider,
       p_ciphertext: encryptApiKey(apiKey, viewer.orgId),
-      p_hint: keyHint(apiKey),
+      p_hint: hintFor(provider, apiKey),
+      p_make_active: makeActive,
     });
-    if (error) return { error: SAVE_ERROR };
+    if (error) {
+      console.error('[ai-key] could not save a workspace key:', error.code, error.message);
+      // The database has not had the multi-provider migration (the function it calls does not exist yet).
+      if (error.code === 'PGRST202' || error.code === '42883') {
+        return {
+          error:
+            'The database needs updating before keys can be saved. Run the latest migrations (20261201090000_ai_keys_multi_provider.sql).',
+        };
+      }
+      return { error: SAVE_ERROR };
+    }
   } catch {
     // No service role on this host. Never surface or log the key.
     return { error: SAVE_ERROR };
   }
 
   revalidatePath('/', 'layout');
-  return { notice: 'Key saved. Chat now runs on your OpenRouter account.' };
+  return { notice: `${info.label} key saved.` };
 }
 
 export async function removeAiKeyAction(
   _prev: SettingsState,
-  _formData: FormData,
+  formData: FormData,
 ): Promise<SettingsState> {
-  void _formData;
   const manager = await requireKeyManager();
   if ('denied' in manager) return { error: manager.denied };
+  const provider = formData.get('provider');
+  if (!isAiProvider(provider)) return { error: 'Choose a key to remove.' };
 
   const supabase = await createClient();
-  const { error } = await supabase.rpc('clear_org_ai_key');
+  const { error } = await supabase.rpc('clear_org_ai_key', { p_provider: provider });
   if (error) return { error: 'Could not remove the key. Please try again.' };
 
   revalidatePath('/', 'layout');
   return { notice: 'Key removed.' };
+}
+
+export async function setActiveAiKeyAction(
+  _prev: SettingsState,
+  formData: FormData,
+): Promise<SettingsState> {
+  const manager = await requireKeyManager();
+  if ('denied' in manager) return { error: manager.denied };
+  const provider = formData.get('provider');
+  if (!isAiProvider(provider)) return { error: 'Choose a key to use.' };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('set_active_org_ai_key', { p_provider: provider });
+  if (error) return { error: 'Could not switch the key. Please try again.' };
+
+  revalidatePath('/', 'layout');
+  return { notice: `Chat and the agents now use your ${PROVIDER_INFO[provider].label} key.` };
 }
 
 export type ChatStatusForViewer = ChatStatus & {

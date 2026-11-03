@@ -22,6 +22,9 @@
     "db:migrate": "node scripts/db-migrate.mjs"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.77",
+    "@ai-sdk/google": "^4.0.92",
+    "@ai-sdk/openai": "^4.0.90",
     "@ai-sdk/react": "^4.0.136",
     "@animateicons/react": "^0.12.0",
     "@modelcontextprotocol/sdk": "1.32.1",
