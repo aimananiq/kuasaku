@@ -8,6 +8,8 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { errorCodeOf } from '@/lib/ai/call-log';
 import { ensureCrmPipeline, loadRequireLostReason, type CrmAccess } from '@/lib/ai/crm-tools';
 import type { FinanceAccess, HireAccess, PeopleAccess, ReachAccess } from '@/lib/ai/agents/orchestrator';
+import { resolveFalApiKey } from '@/lib/ai/fal-provider';
+import type { SharedToolContext } from '@/lib/ai/shared-tools';
 import { peopleWriteFor, type ReceiptFile } from '@/lib/ai/people-tools';
 import type { OrgRole } from '@/lib/auth/current-org';
 import { can } from '@/lib/auth/permissions';
@@ -24,6 +26,7 @@ export type TuahAccess = {
   hire: HireAccess;
   people: PeopleAccess | null;
   finance: FinanceAccess | null;
+  sharedContext?: SharedToolContext;
 };
 
 export async function buildTuahAccess(args: {
@@ -95,5 +98,17 @@ export async function buildTuahAccess(args: {
   // Finance is workspace-only, like the CRM: a non-viewer member gets the change tools (each still approved).
   const finance = org ? { client: supabase, orgId: org.orgId, canWrite: org.role !== 'viewer' } : null;
 
-  return { reach, crm, hire, people, finance };
+  // fal.ai image generation & shared capabilities context
+  const falKey = org ? await resolveFalApiKey(supabase, org.orgId) : await resolveFalApiKey();
+  const sharedContext: SharedToolContext = {
+    agent: 'jebat',
+    client: supabase,
+    orgId: org?.orgId ?? 'mock-org',
+    userId,
+    role: org?.role ?? 'viewer',
+    canWrite: !!(org && org.role !== 'viewer'),
+    falKey,
+  };
+
+  return { reach, crm, hire, people, finance, sharedContext };
 }

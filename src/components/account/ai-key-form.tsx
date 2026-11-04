@@ -8,8 +8,16 @@ import {
   removeAiKeyAction,
   saveAiKeyAction,
   setActiveAiKeyAction,
+  testProviderConnectionAction,
 } from '@/app/account/ai/actions';
-import { AI_PROVIDERS, PROVIDER_INFO, type AiProvider } from '@/lib/ai/providers';
+import {
+  AI_PROVIDERS,
+  MEDIA_PROVIDERS,
+  PROVIDER_INFO,
+  isMediaProvider,
+  keyProviderInfo,
+  type KeyProvider,
+} from '@/lib/ai/providers';
 import { SaveBar } from './settings-form';
 
 export function AiKeyForm({ hasKey }: { hasKey: boolean }) {
@@ -19,8 +27,9 @@ export function AiKeyForm({ hasKey }: { hasKey: boolean }) {
     saveAiKeyAction,
     undefined,
   );
-  const [provider, setProvider] = useState<AiProvider>('openrouter');
-  const info = PROVIDER_INFO[provider];
+  const [provider, setProvider] = useState<KeyProvider>('openrouter');
+  const info = keyProviderInfo(provider);
+  const media = isMediaProvider(provider);
   const keyField = useRef<HTMLInputElement>(null);
 
   // Submitted by hand rather than as a form action: React resets every field of a form
@@ -41,14 +50,23 @@ export function AiKeyForm({ hasKey }: { hasKey: boolean }) {
           id="ai-provider"
           name="provider"
           value={provider}
-          onChange={(e) => setProvider(e.target.value as AiProvider)}
+          onChange={(e) => setProvider(e.target.value as KeyProvider)}
           className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm"
         >
-          {AI_PROVIDERS.map((p) => (
-            <option key={p} value={p}>
-              {PROVIDER_INFO[p].label}
-            </option>
-          ))}
+          <optgroup label="Chat and the agents">
+            {AI_PROVIDERS.map((p) => (
+              <option key={p} value={p}>
+                {PROVIDER_INFO[p].label}
+              </option>
+            ))}
+          </optgroup>
+          <optgroup label="Images and video">
+            {MEDIA_PROVIDERS.map((p) => (
+              <option key={p} value={p}>
+                {keyProviderInfo(p).label}
+              </option>
+            ))}
+          </optgroup>
         </select>
       </div>
       <div className="space-y-2">
@@ -78,15 +96,22 @@ export function AiKeyForm({ hasKey }: { hasKey: boolean }) {
           provider you already added replaces it.
         </p>
       </div>
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          name="makeActive"
-          defaultChecked={!hasKey}
-          className="size-4"
-        />
-        Use this key for chat and the agents
-      </label>
+      {media ? (
+        <p className="text-sm text-muted-foreground">
+          This key is for the agents&apos; images and video only. Chat keeps using
+          your chat key.
+        </p>
+      ) : (
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            name="makeActive"
+            defaultChecked={!hasKey}
+            className="size-4"
+          />
+          Use this key for chat and the agents
+        </label>
+      )}
       <SaveBar state={state} pending={pending} label="Save key" />
     </form>
   );
@@ -99,24 +124,35 @@ export function SavedAiKeyRow({
   active,
   canManage,
 }: {
-  provider: AiProvider;
+  provider: KeyProvider;
   hint: string;
   active: boolean;
   canManage: boolean;
 }) {
   const [useState_, useAction, using] = useActionState(setActiveAiKeyAction, undefined);
   const [removeState, removeAction, removing] = useActionState(removeAiKeyAction, undefined);
-  const error = useState_?.error ?? removeState?.error;
+  const [testState, testAction, testing] = useActionState(testProviderConnectionAction, undefined);
+  const error = useState_?.error ?? removeState?.error ?? testState?.error;
+  const notice = testState?.notice;
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 rounded-lg border p-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="font-medium">{PROVIDER_INFO[provider].label}</p>
+          <p className="font-medium">{keyProviderInfo(provider).label}</p>
           <p className="text-sm text-muted-foreground">{hint}</p>
+          {provider === 'fal' ? (
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Default model: <span className="font-mono">fal-ai/flux-2</span> &bull; Type: Image Generation
+            </p>
+          ) : null}
         </div>
         <div className="flex items-center gap-2">
-          {active ? (
+          {isMediaProvider(provider) ? (
+            <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+              Images and video
+            </span>
+          ) : active ? (
             <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
               In use
             </span>
@@ -125,6 +161,14 @@ export function SavedAiKeyRow({
               <input type="hidden" name="provider" value={provider} />
               <Button type="submit" variant="outline" size="sm" disabled={using}>
                 {using ? 'Switching…' : 'Use this key'}
+              </Button>
+            </form>
+          ) : null}
+          {canManage ? (
+            <form action={testAction}>
+              <input type="hidden" name="provider" value={provider} />
+              <Button type="submit" variant="outline" size="sm" disabled={testing}>
+                {testing ? 'Testing…' : 'Test connection'}
               </Button>
             </form>
           ) : null}
@@ -138,6 +182,11 @@ export function SavedAiKeyRow({
           ) : null}
         </div>
       </div>
+      {notice ? (
+        <p role="status" className="text-xs text-emerald-600">
+          {notice}
+        </p>
+      ) : null}
       {error ? (
         <p role="alert" className="text-sm text-destructive">
           {error}

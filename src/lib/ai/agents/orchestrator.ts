@@ -29,8 +29,10 @@ import {
   financeProduct,
   hireProduct,
   kasturiSharedProduct,
+  metaProduct,
   peopleProduct,
   reachProduct,
+  sharedProduct,
   type ApprovalBinding,
   type FinanceAccess,
   type HireAccess,
@@ -38,6 +40,7 @@ import {
   type ProductToolkit,
   type ReachAccess,
 } from '@/lib/ai/products';
+import type { SharedToolContext } from '@/lib/ai/shared-tools';
 import {
   BENDAHARA_SYSTEM,
   bendaharaSystem,
@@ -107,8 +110,19 @@ export function runJebat(
   apiKey?: string,
   /** Where proposed changes are kept; a chat route passes its own. */
   approvals?: ApprovalBinding,
+  sharedContext?: SharedToolContext,
 ) {
-  const { tools, toolApproval } = boundToolkit([reachProduct(reach)], messages, approvals);
+  const sharedCtx: SharedToolContext = sharedContext ?? {
+    agent: 'jebat',
+    client: (reach.write?.ctx.client ?? ({} as unknown)) as import('@supabase/supabase-js').SupabaseClient,
+    orgId: reach.write?.ctx.orgId ?? 'mock-org',
+    canWrite: reach.write?.canWrite ?? true,
+  };
+  const { tools, toolApproval } = boundToolkit(
+    [reachProduct(reach), sharedProduct(sharedCtx), ...(sharedCtx.orgId !== 'mock-org' ? [metaProduct(sharedCtx)] : [])],
+    messages,
+    approvals,
+  );
   return streamText({
     model: inUsersLanguage(getModel('orchestrator', apiKey)),
     system: cachedInstructions(JEBAT_SYSTEM),
@@ -117,8 +131,8 @@ export function runJebat(
     toolApproval,
     onLanguageModelCallEnd: logModelCall('jebat', pickModelId('orchestrator')),
     onError: logModelError('jebat'),
-    stopWhen: stepCountIs(8),
-    maxOutputTokens: 1000,
+    stopWhen: stepCountIs(10),
+    maxOutputTokens: 1200,
     // Stop in-flight model/tool work if the client disconnects.
     abortSignal,
   });
@@ -127,8 +141,8 @@ export function runJebat(
 /**
  * "Kasturi, your sales co-pilot": the same single agent as Jebat, holding the
  * CRM tools instead of the marketing ones, plus the marketing tools for the
- * two screens it shares with Jebat (Appointments and Lead Forms). Lookups run
- * on their own; each change waits for the owner's approval.
+ * two screens it shares with Jebat (Appointments and Lead Forms) and the shared
+ * capabilities (image generation, landing page builder, form connecting).
  */
 export function runKasturi(
   messages: ModelMessage[],
@@ -139,8 +153,20 @@ export function runKasturi(
   apiKey?: string,
   /** Where proposed changes are kept; a chat route passes its own. */
   approvals?: ApprovalBinding,
+  sharedContext?: SharedToolContext,
 ) {
-  const { tools, toolApproval } = boundToolkit([crmProduct(crm), kasturiSharedProduct(reach)], messages, approvals);
+  const sharedCtx: SharedToolContext = sharedContext ?? {
+    agent: 'kasturi',
+    client: crm.client,
+    orgId: crm.orgId,
+    userId: crm.userId,
+    canWrite: crm.canWrite,
+  };
+  const { tools, toolApproval } = boundToolkit(
+    [crmProduct(crm), kasturiSharedProduct(reach), sharedProduct(sharedCtx)],
+    messages,
+    approvals,
+  );
   return streamText({
     model: inUsersLanguage(getModel('orchestrator', apiKey)),
     // The fixed prompt is marked for the provider's cache; today's date and time follow it, unmarked.
@@ -152,7 +178,7 @@ export function runKasturi(
     onError: logModelError('kasturi'),
     // A CRM change often needs two lookups first (the contact, then the stage).
     stopWhen: stepCountIs(10),
-    maxOutputTokens: 1000,
+    maxOutputTokens: 1200,
     abortSignal,
   });
 }
@@ -255,8 +281,8 @@ export function runBendahara(
 /** What each specialist is for, as Tuah's instructions put it. */
 export const TEAM_AREA = {
   reach:
-    'marketing: ads and campaigns, spend, leads (finding, adding and editing them, and promoting a lead to a CRM contact), lead forms, creatives, appointments and ad settings',
-  crm: 'the CRM: contacts, deals, pipelines and their stages, follow-ups (reminders to get back to a contact), the calendar, and looking up sales invoices and what customers owe. A lead is not a contact yet: anything about a lead goes to Jebat',
+    'marketing: ads and campaigns, spend, leads (finding, adding and editing them, and promoting a lead to a CRM contact), lead forms, creatives, appointments, ad settings, generating AI images via fal.ai, and creating or editing landing pages',
+  crm: 'the CRM: contacts, deals, pipelines and their stages, follow-ups (reminders to get back to a contact), the calendar, looking up sales invoices and what customers owe, generating AI images via fal.ai, and creating or editing landing pages. A lead is not a contact yet: anything about a lead goes to Jebat',
   hire: 'hiring: job openings, candidates and their applications, the hiring funnel, interviews, the talent pool and time to hire. Job openings can be created, edited, opened, paused, closed and deleted. Applications can be moved, rejected, reopened and rated, one at a time. Candidates can be added by hand and edited, one at a time. An application or a candidate can be deleted, one at a time. A candidate can be added to the talent pool, given a pool status, removed from the pool or moved to the pipeline for a job, one at a time. An interview can be scheduled, changed, cancelled, marked completed or a no-show, marked scheduled again, or recorded after it took place, one at a time. Feedback on a completed interview (a rating out of 5, a recommendation and comments) can be recorded or cleared, one at a time. Existing staff, leave and payroll are not hiring. It can read one candidate\'s uploaded CV and give a verdict on it',
   people: 'HR: existing staff, leave, time-off, claims, overtime, attendance, payroll and performance. It looks these up (an owner or admin sees everyone; a manager sees their own and their direct reports\' leave, time-off, claims, attendance and overtime; everyone else sees their own) and can prepare changes that wait for approval — deciding leave, time-off, claims and overtime (a manager decides their direct reports\' only), correcting attendance, and editing staff and departments, one change at a time. Hiring new people is not HR',
   finance: 'finance: sales invoices and quotations, supplier bills, payments in and out, credit notes, refunds, customers and suppliers, items, and bank and cash accounts, plus purchasing (requests for quotation and purchase orders), the chart of accounts, the ledger and manual journals, and financial reports (P&L, balance sheet, trial balance, cash flow, aged receivables and payables). It looks these up and can prepare changes that wait for approval — drafting, posting and voiding invoices and bills, recording payments, issuing credit notes and refunds, managing customers, suppliers and items, handling RFQs and purchase orders, and posting manual journals',
@@ -303,11 +329,37 @@ export function runTuah(
   finance?: FinanceAccess | null,
   /** Where proposed changes are kept; a chat route passes its own. */
   approvals?: ApprovalBinding,
+  sharedContext?: SharedToolContext,
 ) {
+  const sharedCtxJebat: SharedToolContext | undefined = sharedContext
+    ? { ...sharedContext, agent: 'jebat' }
+    : reach.write?.ctx
+      ? {
+          agent: 'jebat',
+          client: reach.write.ctx.client,
+          orgId: reach.write.ctx.orgId,
+          role: 'admin',
+          canWrite: reach.write.canWrite,
+        }
+      : undefined;
+
+  const sharedCtxKasturi: SharedToolContext | undefined = sharedContext
+    ? { ...sharedContext, agent: 'kasturi' }
+    : crm
+      ? {
+          agent: 'kasturi',
+          client: crm.client,
+          orgId: crm.orgId,
+          userId: crm.userId,
+          role: crm.canWrite ? 'admin' : 'viewer',
+          canWrite: crm.canWrite,
+        }
+      : undefined;
+
   // Every product the user can reach: marketing always, the CRM in a workspace, hiring when passed, HR when passed, finance when passed.
   const products = [
-    reachProduct(reach),
-    ...(crm ? [crmProduct(crm)] : []),
+    reachProduct(reach, sharedCtxJebat),
+    ...(crm ? [crmProduct(crm, sharedCtxKasturi)] : []),
     ...(hire ? [hireProduct(hire)] : []),
     ...(people ? [peopleProduct(people)] : []),
     ...(finance ? [financeProduct(finance)] : []),

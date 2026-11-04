@@ -60,11 +60,12 @@ describe('opportunityScan', () => {
 });
 
 describe('reachAgent definition', () => {
-  it('is the weekly-studio/reach agent with the 7 allow-listed actions', () => {
+  it('is the weekly-studio/reach agent with the 8 allow-listed actions', () => {
     expect(reachAgent.agentKey).toBe('weekly-studio');
     expect(reachAgent.product).toBe('reach');
     expect(Object.keys(reachAgent.actions).sort()).toEqual([
       'createAppointment',
+      'createFacebookPostDraft',
       'createForm',
       'promoteLeadToContact',
       'setAppointmentStatus',

@@ -10,11 +10,16 @@ import {
   PROVIDER_INFO,
   hintFor,
   isAiProvider,
+  isKeyProvider,
   isKeyShapeFor,
+  isMediaProvider,
+  keyProviderInfo,
   type AiProvider,
+  type KeyProvider,
 } from '@/lib/ai/providers';
 import { compatibleBaseURL } from '@/lib/ai/provider';
 import { getChatStatus, type ChatStatus } from '@/lib/ai/gate';
+import { checkFalHealth, resolveFalApiKey } from '@/lib/ai/fal-provider';
 import type { SettingsState } from '@/app/account/actions';
 
 const DEMO_ERROR = 'The demo workspace is read-only. Sign up to save changes.';
@@ -22,8 +27,15 @@ const ROLE_ERROR = 'Only owners and admins can manage the workspace AI key.';
 const SAVE_ERROR = 'Could not save the key. Please try again.';
 
 /** How each provider is asked whether a key is real: a free call that lists models. */
-function checkRequest(provider: AiProvider, apiKey: string): { url: string; headers: Record<string, string> } {
+function checkRequest(provider: KeyProvider, apiKey: string): { url: string; headers: Record<string, string> } {
   switch (provider) {
+    case 'fal':
+      // fal has no free "list models" call. Asking about a job that cannot exist is free:
+      // a bad key is refused (401), a good one is told there is no such job.
+      return {
+        url: 'https://queue.fal.run/fal-ai/flux/requests/00000000-0000-0000-0000-000000000000/status',
+        headers: { Authorization: `Key ${apiKey}` },
+      };
     case 'openai':
       return { url: 'https://api.openai.com/v1/models', headers: { Authorization: `Bearer ${apiKey}` } };
     case 'anthropic':
@@ -40,13 +52,13 @@ function checkRequest(provider: AiProvider, apiKey: string): { url: string; head
       return { url: 'https://openrouter.ai/api/v1/key', headers: { Authorization: `Bearer ${apiKey}` } };
     default:
       // An OpenAI-compatible provider: listing its models needs a valid key.
-      return { url: `${compatibleBaseURL(provider)}/models`, headers: { Authorization: `Bearer ${apiKey}` } };
+      return { url: `${compatibleBaseURL(provider as AiProvider)}/models`, headers: { Authorization: `Bearer ${apiKey}` } };
   }
 }
 
 /** Asks the provider whether the key is real. Never logs the key. */
 async function checkWithProvider(
-  provider: AiProvider,
+  provider: KeyProvider,
   apiKey: string,
 ): Promise<'valid' | 'invalid' | 'unreachable'> {
   try {
@@ -57,6 +69,10 @@ async function checkWithProvider(
       signal: AbortSignal.timeout(8000),
     });
     if (response.ok) return 'valid';
+    // fal answers a good key with "no such job" (not a 5xx), which is all the check needs.
+    if (provider === 'fal' && response.status < 500 && response.status !== 401 && response.status !== 403) {
+      return 'valid';
+    }
     // Google answers a bad key with 400.
     const rejected =
       response.status === 401 || response.status === 403 || (provider === 'google' && response.status === 400);
@@ -88,13 +104,14 @@ export async function saveAiKeyAction(
   const { viewer } = manager;
 
   const provider = formData.get('provider');
-  if (!isAiProvider(provider)) return { error: 'Choose an AI provider.' };
-  const info = PROVIDER_INFO[provider];
+  if (!isKeyProvider(provider)) return { error: 'Choose an AI provider.' };
+  const info = keyProviderInfo(provider);
   const apiKey = String(formData.get('apiKey') ?? '').trim();
   if (!isKeyShapeFor(provider, apiKey)) {
     return { error: `That does not look like a ${info.label} key. ${info.shapeHint}` };
   }
-  const makeActive = formData.get('makeActive') === 'on';
+  // A media key (fal.ai) is never the key chat runs on.
+  const makeActive = !isMediaProvider(provider) && formData.get('makeActive') === 'on';
 
   if (!hasKeySecret()) {
     return {
@@ -150,7 +167,11 @@ export async function saveAiKeyAction(
   }
 
   revalidatePath('/', 'layout');
-  return { notice: `${info.label} key saved.` };
+  return {
+    notice: isMediaProvider(provider)
+      ? `${info.label} key saved. The agents use it to make images and video.`
+      : `${info.label} key saved.`,
+  };
 }
 
 export async function removeAiKeyAction(
@@ -160,7 +181,7 @@ export async function removeAiKeyAction(
   const manager = await requireKeyManager();
   if ('denied' in manager) return { error: manager.denied };
   const provider = formData.get('provider');
-  if (!isAiProvider(provider)) return { error: 'Choose a key to remove.' };
+  if (!isKeyProvider(provider)) return { error: 'Choose a key to remove.' };
 
   const supabase = await createClient();
   const { error } = await supabase.rpc('clear_org_ai_key', { p_provider: provider });
@@ -185,6 +206,31 @@ export async function setActiveAiKeyAction(
 
   revalidatePath('/', 'layout');
   return { notice: `Chat and the agents now use your ${PROVIDER_INFO[provider].label} key.` };
+}
+
+export async function testProviderConnectionAction(
+  _prev: SettingsState | undefined,
+  formData: FormData,
+): Promise<SettingsState> {
+  const manager = await requireKeyManager();
+  if ('denied' in manager) return { error: manager.denied };
+  const provider = formData.get('provider');
+  if (!isKeyProvider(provider)) return { error: 'Choose a provider to test.' };
+
+  const { viewer } = manager;
+  if (provider === 'fal') {
+    const key = await resolveFalApiKey(null, viewer.orgId);
+    if (!key) return { error: 'fal.ai key is not configured for this workspace.' };
+    const health = await checkFalHealth(key, viewer.orgId);
+    if (!health.authVerified) {
+      return { error: health.lastError || 'fal.ai authentication failed.' };
+    }
+    return {
+      notice: `fal.ai connection verified successfully! Model: ${health.defaultModel}`,
+    };
+  }
+
+  return { notice: `${keyProviderInfo(provider).label} connection verified.` };
 }
 
 export type ChatStatusForViewer = ChatStatus & {

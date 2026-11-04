@@ -1,5 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { checkVideo } from '@/lib/agents/openrouter-media';
+import * as fal from '@/lib/agents/fal-media';
+import { readMediaKey } from '@/lib/ai/media-key';
 import { readWorkspaceKey } from '@/lib/ai/workspace-key';
 import { workspaceSpendCents } from '@/lib/agents/spend';
 import { runAgent, type AgentRunResult } from '@/lib/agents/run-agent';
@@ -357,6 +359,11 @@ export async function pollVideos(client: SupabaseClient): Promise<void> {
   if (error || !data) return;
 
   const keys = new Map<string, string | null>();
+  const falKeys = new Map<string, string | null>();
+  const falKeyFor = async (orgId: string): Promise<string | null> => {
+    if (!falKeys.has(orgId)) falKeys.set(orgId, await readMediaKey(client, orgId, 'fal'));
+    return falKeys.get(orgId) ?? null;
+  };
   const keyFor = async (orgId: string): Promise<string | null> => {
     if (keys.has(orgId)) return keys.get(orgId) ?? null;
     // `orgId` is the asset row's own workspace; the key opens only for it.
@@ -401,12 +408,16 @@ export async function pollVideos(client: SupabaseClient): Promise<void> {
   for (const asset of data as PendingVideo[]) {
     try {
       const expired = Date.now() - new Date(asset.created_at).getTime() > VIDEO_MAX_AGE_MS;
-      const apiKey = await keyFor(asset.org_id);
+      // A fal job is polled with the workspace's fal key, any other with its OpenRouter key.
+      const onFal = fal.isFalJob(asset.provider_job_id);
+      const apiKey = onFal ? await falKeyFor(asset.org_id) : await keyFor(asset.org_id);
       if (!apiKey || !asset.provider_job_id) {
         await mark(asset, { status: 'failed' });
         continue;
       }
-      const check = await checkVideo(apiKey, asset.provider_job_id);
+      const check = onFal
+        ? await fal.checkVideo(apiKey, asset.provider_job_id)
+        : await checkVideo(apiKey, asset.provider_job_id);
       // Settle the cost before the asset leaves 'pending' (only pending assets are
       // polled). If it cannot be settled yet, keep the asset pending and retry,
       // unless it has expired: then it is finished on its estimate.

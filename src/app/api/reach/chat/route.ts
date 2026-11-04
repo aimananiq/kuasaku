@@ -10,6 +10,8 @@
 import { streamErrorHandler } from '@/lib/ai/call-log';
 import { prepareChat } from '@/lib/ai/chat-request';
 import { runJebat } from '@/lib/ai/agents/orchestrator';
+import { resolveFalApiKey } from '@/lib/ai/fal-provider';
+import type { SharedToolContext } from '@/lib/ai/shared-tools';
 import { getCurrentOrg } from '@/lib/auth/current-org';
 import { can } from '@/lib/auth/permissions';
 import { hasSupabaseEnv } from '@/lib/auth/viewer';
@@ -38,9 +40,21 @@ export async function POST(request: Request) {
         }
       : undefined;
 
+  // Resolve fal.ai API key for image generation
+  const falKey = org ? await resolveFalApiKey(chat.supabase, org.orgId) : await resolveFalApiKey();
+  const sharedCtx: SharedToolContext = {
+    agent: 'jebat',
+    client: chat.supabase,
+    orgId: org?.orgId ?? 'mock-org',
+    userId: chat.userId,
+    role: org?.role ?? 'viewer',
+    canWrite: !!(org && org.role !== 'viewer'),
+    falKey,
+  };
+
   // An approval is answered from the server's record of the change, never from what the browser sent back.
   const approvals = await chatApprovals(chat, org?.orgId ?? null);
-  const result = runJebat(chat.messages, { data, write }, request.signal, chat.apiKey, approvals);
+  const result = runJebat(chat.messages, { data, write }, request.signal, chat.apiKey, approvals, sharedCtx);
 
   return result.toUIMessageStreamResponse({
     onError: streamErrorHandler('ask-jebat', 'Jebat ran into a problem. Please try again in a moment.'),

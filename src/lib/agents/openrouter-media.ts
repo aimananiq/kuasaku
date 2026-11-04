@@ -11,6 +11,9 @@
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { generateImage as aiGenerateImage, generateText } from 'ai';
 import { usdToCents } from '@/lib/agents/costs';
+import { getModel } from '@/lib/ai/provider';
+
+import { isDirectKey } from '@/lib/agents/key-kind';
 
 /**
  * `cost_cents` is what the provider reported for the call, in whole cents, or `null`
@@ -50,6 +53,12 @@ function costFromMetadata(meta: unknown): number | null {
 }
 
 export async function complete(apiKey: string, modelId: string, prompt: string): Promise<DigestResult> {
+  // A workspace on its own DeepSeek/Google/... key: use that provider's model (the OpenRouter slug means nothing
+  // there). It reports no cost, so the caller books the step at its estimate and the spend caps still hold.
+  if (isDirectKey(apiKey)) {
+    const { text } = await generateText({ model: getModel('worker', apiKey), prompt });
+    return { text, cost_cents: null };
+  }
   const { text, providerMetadata } = await generateText({
     model: provider(apiKey)(modelId),
     prompt,
@@ -59,6 +68,11 @@ export async function complete(apiKey: string, modelId: string, prompt: string):
 
 /** Web-grounded research. Uses a search-native model; append `:online` to any slug via env to ground it instead. */
 export async function webSearch(apiKey: string, query: string): Promise<DigestResult> {
+  // Live web search needs a search-native OpenRouter model. On another provider the angles come from the model's own
+  // knowledge, and the prompt says so, so they are not presented as fresh research.
+  if (isDirectKey(apiKey)) {
+    return complete(apiKey, SEARCH_MODEL(), `You have no live web access; draw on general marketing knowledge and say so briefly.\n\n${query}`);
+  }
   return complete(apiKey, SEARCH_MODEL(), query);
 }
 

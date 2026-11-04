@@ -12,6 +12,8 @@
 import { streamErrorHandler } from '@/lib/ai/call-log';
 import { chatJson, prepareChat } from '@/lib/ai/chat-request';
 import { runKasturi } from '@/lib/ai/agents/orchestrator';
+import { resolveFalApiKey } from '@/lib/ai/fal-provider';
+import type { SharedToolContext } from '@/lib/ai/shared-tools';
 import { ensureCrmPipeline, loadRequireLostReason } from '@/lib/ai/crm-tools';
 import { getCurrentOrg } from '@/lib/auth/current-org';
 import { hasSupabaseEnv } from '@/lib/auth/viewer';
@@ -40,6 +42,19 @@ export async function POST(request: Request) {
   if (canWrite) await ensureCrmPipeline(chat.supabase, org.orgId);
   // The workspace's lost-reason rule, so Kasturi asks for a reason before offering to mark a deal lost.
   const requireLostReason = canWrite ? await loadRequireLostReason(chat.supabase, org.orgId) : false;
+
+  // Resolve fal.ai API key for image generation
+  const falKey = await resolveFalApiKey(chat.supabase, org.orgId);
+  const sharedCtx: SharedToolContext = {
+    agent: 'kasturi',
+    client: chat.supabase,
+    orgId: org.orgId,
+    userId: chat.userId,
+    role: org.role,
+    canWrite,
+    falKey,
+  };
+
   const result = runKasturi(
     chat.messages,
     { client: chat.supabase, orgId: org.orgId, userId: chat.userId, canWrite, requireLostReason },
@@ -52,6 +67,7 @@ export async function POST(request: Request) {
     chat.apiKey,
     // An approval is answered from the server's record of the change, never from what the browser sent back.
     await chatApprovals(chat, org.orgId),
+    sharedCtx,
   );
 
   return result.toUIMessageStreamResponse({

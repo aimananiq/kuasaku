@@ -79,6 +79,10 @@ function Muted({ children }: { children: React.ReactNode }) {
 
 /** What a visitor will see, drawn small from what is in the form. */
 function PagePreview({ draft, orgHint }: { draft: Draft; orgHint: string }) {
+  // Check for hero image in draft body
+  const imageMatch = draft.body.match(/!\[(.*?)\]\((https:\/\/[^\s)]+)\)/);
+  const heroImageUrl = imageMatch ? imageMatch[2] : null;
+
   return (
     <div className="overflow-hidden rounded-xl border bg-background shadow-sm" aria-label="Preview">
       <div className="flex items-center gap-1.5 border-b bg-muted/40 px-3 py-2">
@@ -94,8 +98,21 @@ function PagePreview({ draft, orgHint }: { draft: Draft; orgHint: string }) {
         {draft.subheadline ? (
           <p className="text-xs text-muted-foreground break-words">{draft.subheadline}</p>
         ) : null}
+        {heroImageUrl ? (
+          <div className="my-1 overflow-hidden rounded-md border bg-card">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={heroImageUrl}
+              alt="Preview hero visual"
+              className="h-28 w-full rounded-md object-cover"
+              loading="lazy"
+            />
+          </div>
+        ) : null}
         {draft.body ? (
-          <p className="line-clamp-4 whitespace-pre-line text-[11px] leading-relaxed break-words">{draft.body}</p>
+          <p className="line-clamp-4 whitespace-pre-line text-[11px] leading-relaxed break-words">
+            {draft.body.replace(/!\[.*?\]\(https:\/\/.*?\)/g, '')}
+          </p>
         ) : null}
         <div className="space-y-1.5 rounded-lg border bg-card p-3">
           {['Name', 'Email', 'Phone', 'Message'].map((field) => (

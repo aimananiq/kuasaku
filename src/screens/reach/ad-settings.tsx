@@ -11,6 +11,11 @@ import { PageHeader } from '@/components/screen/page-header';
 import { BentoGrid, BentoCard } from '@/components/bento/bento';
 import { RadialGauge } from '@/components/charts';
 import { Badge } from '@/components/ui/badge';
+import { MetaConnectionCard } from '@/components/reach/meta-connection-card';
+import { MetaPostsCard, type PostView } from '@/components/reach/meta-posts-card';
+import { MetaAdsCard, type AdDraftView, type JobView } from '@/components/reach/meta-ads-card';
+import { NOT_CONNECTED, publicStatus } from '@/lib/meta/connection';
+import { createClient } from '@/lib/supabase/server';
 import { AdSettingsForm } from '@/components/reach/ad-settings-form';
 import { WorkspaceCard } from '@/components/settings/workspace-card';
 import { loadWorkspaceOverview } from '@/lib/account/workspace-overview';
@@ -84,6 +89,26 @@ function StatusIcon({ status }: { status: Status }) {
 export default async function AdSettingsScreen() {
   const [data, viewer, workspace] = await Promise.all([loadReachData(), getViewer(), loadWorkspaceOverview()]);
   const settings = await data.getAdSettings();
+  const metaStatus = viewer.isDemo ? NOT_CONNECTED : await publicStatus(await createClient());
+  const session = viewer.isDemo ? null : await createClient();
+  const [draftRows, jobRows, postRows] = session
+    ? await Promise.all([
+        session.from('meta_ad_drafts').select('*').order('created_at', { ascending: false }).limit(10),
+        session.from('meta_jobs').select('id,kind,run_at,status,last_error').order('run_at', { ascending: false }).limit(10),
+        session.from('meta_page_posts').select('id,message,link,media_urls,status,scheduled_at,published_at,last_error').order('created_at', { ascending: false }).limit(10),
+      ])
+    : [{ data: [] }, { data: [] }, { data: [] }];
+  const drafts: AdDraftView[] = ((draftRows.data ?? []) as Record<string, any>[]).map((d) => ({ // eslint-disable-line @typescript-eslint/no-explicit-any
+    id: d.id, name: d.name, objective: d.objective, status: d.status, adAccountId: d.ad_account_id, pageName: metaStatus.pageName, budgetType: d.budget_type,
+    budgetMinor: Number(d.budget_minor), currency: d.currency, startsAt: d.starts_at, endsAt: d.ends_at, countries: d.targeting?.countries ?? [],
+    ageMin: d.targeting?.ageMin, ageMax: d.targeting?.ageMax, headline: d.headline, primaryText: d.primary_text, description: d.description, cta: d.cta,
+    linkUrl: d.link_url, imageUrl: d.image_url, imageStatus: d.image_status, configHash: d.config_hash, approvalExpiresAt: d.approval_expires_at,
+    lastError: d.last_error, built: Boolean(d.meta_ad_id),
+  }));
+  const jobs: JobView[] = ((jobRows.data ?? []) as Record<string, any>[]).map((j) => ({ id: j.id, kind: j.kind, runAt: j.run_at, status: j.status, lastError: j.last_error })); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const posts: PostView[] = ((postRows.data ?? []) as Record<string, any>[]).map((p) => ({ // eslint-disable-line @typescript-eslint/no-explicit-any
+    id: p.id, message: p.message, link: p.link, mediaUrls: p.media_urls ?? [], status: p.status, scheduledAt: p.scheduled_at, publishedAt: p.published_at, lastError: p.last_error,
+  }));
   const canEdit = !viewer.isDemo && can(viewer.role, 'edit-data');
   const issues = CHECKS.filter((c) => c.status === 'Action needed').length;
 
@@ -99,27 +124,22 @@ export default async function AdSettingsScreen() {
         <WorkspaceCard overview={workspace} />
 
         {/* Connected account */}
-        <BentoCard
-          title="Connected account"
-          subtitle="Link Meta to run and sync ads"
-          icon={Plug}
-          className="col-span-2 md:col-span-6"
-        >
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
-                <Megaphone className="size-5" />
-              </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="font-medium">Meta Business</p>
-                  <Badge variant="secondary">Not connected</Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">Connecting Meta is coming soon.</p>
-              </div>
-            </div>
-          </div>
-        </BentoCard>
+        <MetaConnectionCard
+          status={metaStatus}
+          canManage={!viewer.isDemo && can(viewer.role, 'manage-ads-account')}
+          oauthReady={Boolean(process.env.META_APP_ID?.trim() && process.env.META_APP_SECRET?.trim())}
+        />
+
+        {metaStatus.connected && <MetaPostsCard posts={posts} canManage={!viewer.isDemo && can(viewer.role, 'manage-ads-account')} />}
+
+        {metaStatus.connected && (
+          <MetaAdsCard
+            drafts={drafts}
+            jobs={jobs}
+            canManage={!viewer.isDemo && can(viewer.role, 'manage-ads-account')}
+            canApprove={!viewer.isDemo && can(viewer.role, 'approve-ad-spend')}
+          />
+        )}
 
         <AdSettingsForm settings={settings} canEdit={canEdit} />
 

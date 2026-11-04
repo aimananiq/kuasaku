@@ -146,6 +146,42 @@ export const PROVIDER_INFO: Record<AiProvider, ProviderInfo> = {
   },
 };
 
+/**
+ * Providers a workspace can bring a key for that are NOT chat providers: they
+ * make images and video for the agents. A key for one is saved beside the chat
+ * keys but is never the key chat runs on (it is never "in use" for chat).
+ */
+export const MEDIA_PROVIDERS = ['fal'] as const;
+export type MediaProvider = (typeof MEDIA_PROVIDERS)[number];
+
+export const MEDIA_PROVIDER_INFO: Record<MediaProvider, ProviderInfo> = {
+  fal: {
+    label: 'fal.ai (images and video)',
+    placeholder: 'fal key (id:secret)',
+    keysUrl: 'https://fal.ai/dashboard/keys',
+    hintPrefix: 'fal_',
+    // Keys look like `<id>:<secret>`, sometimes with a `fal_sk_` prefix.
+    shape: /^[A-Za-z0-9._:-]{16,300}$/,
+    shapeHint: 'Check that you copied the whole key.',
+    native: false,
+  },
+};
+
+export function isMediaProvider(value: unknown): value is MediaProvider {
+  return typeof value === 'string' && (MEDIA_PROVIDERS as readonly string[]).includes(value);
+}
+
+/** A chat provider or a media provider. */
+export type KeyProvider = AiProvider | MediaProvider;
+
+export function isKeyProvider(value: unknown): value is KeyProvider {
+  return isAiProvider(value) || isMediaProvider(value);
+}
+
+export function keyProviderInfo(provider: KeyProvider): ProviderInfo {
+  return isMediaProvider(provider) ? MEDIA_PROVIDER_INFO[provider] : PROVIDER_INFO[provider];
+}
+
 export function isAiProvider(value: unknown): value is AiProvider {
   return typeof value === 'string' && (AI_PROVIDERS as readonly string[]).includes(value);
 }
@@ -156,13 +192,13 @@ export function detectProvider(apiKey: string): AiProvider | null {
   return AI_PROVIDERS.find((p) => PROVIDER_INFO[p].native && PROVIDER_INFO[p].shape.test(key)) ?? null;
 }
 
-export function isKeyShapeFor(provider: AiProvider, apiKey: string): boolean {
-  return PROVIDER_INFO[provider].shape.test(apiKey.trim());
+export function isKeyShapeFor(provider: KeyProvider, apiKey: string): boolean {
+  return keyProviderInfo(provider).shape.test(apiKey.trim());
 }
 
 /** What is shown about a saved key: its start and its last four characters. */
-export function hintFor(provider: AiProvider, apiKey: string): string {
-  return `${PROVIDER_INFO[provider].hintPrefix}…${apiKey.trim().slice(-4)}`;
+export function hintFor(provider: KeyProvider, apiKey: string): string {
+  return `${keyProviderInfo(provider).hintPrefix}…${apiKey.trim().slice(-4)}`;
 }
 
 const REF = 'kr1:';

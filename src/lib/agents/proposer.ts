@@ -129,7 +129,7 @@ export async function proposeChanges(
         action: c.action,
         input,
         title,
-        detail: c.detail,
+        detail: c.detailFor ? c.detailFor(input) : c.detail,
         rationale: sel.rationale.slice(0, 280),
         status: 'pending',
         check_key: c.checkKey ?? null,

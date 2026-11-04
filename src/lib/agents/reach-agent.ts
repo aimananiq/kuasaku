@@ -18,6 +18,9 @@ import {
 } from '@/lib/reach/capabilities';
 import { approvalDetail, approvalTitle, type ItemKind } from '@/lib/chat/change-titles';
 import { generateImage, startVideo } from '@/lib/agents/openrouter-media';
+import { isDirectKey } from '@/lib/agents/key-kind';
+import { createFacebookPostDraft, createFacebookPostDraftInput } from '@/lib/meta/agent-action';
+import * as fal from '@/lib/agents/fal-media';
 import { IMAGE_ESTIMATE_CENTS, VIDEO_ESTIMATE_CENTS, costOr } from '@/lib/agents/costs';
 import { WEEKLY_STUDIO } from '@/lib/agents/types';
 import { createSupabaseReachData } from '@/lib/reach/supabase';
@@ -118,6 +121,28 @@ async function noRecentFormProposal(service: SupabaseClient, orgId: string): Pro
   return (data ?? []).length === 0;
 }
 
+/** Facebook post drafts are offered at most once a week, whatever the owner decided about the last one. */
+const POST_DRAFT_COOLDOWN_MS = 6 * 24 * 3600_000;
+
+/** True when the workspace has a Meta connection with a Page selected and no draft was proposed this week. Fails closed. */
+async function canOfferPostDraft(service: SupabaseClient, orgId: string): Promise<boolean> {
+  try {
+    return await canOfferPostDraftUnsafe(service, orgId);
+  } catch {
+    return false; // a failed read must not stop the run's other suggestions
+  }
+}
+
+async function canOfferPostDraftUnsafe(service: SupabaseClient, orgId: string): Promise<boolean> {
+  const { data: conn, error } = await service
+    .from('org_meta_connections').select('page_id,status').eq('org_id', orgId).maybeSingle();
+  if (error || !conn || conn.status !== 'connected' || !conn.page_id) return false;
+  const since = new Date(Date.now() - POST_DRAFT_COOLDOWN_MS).toISOString();
+  const { data, error: pErr } = await service
+    .from('agent_proposals').select('id').eq('org_id', orgId).eq('action', 'createFacebookPostDraft').gte('created_at', since).limit(1);
+  return !pErr && (data ?? []).length === 0;
+}
+
 /**
  * The reach / "Weekly Studio" autonomous agent, expressed as an {@link AgentDefinition}.
  * This is the behavior-preserving home for what used to live inline in weekly-studio.ts +
@@ -149,8 +174,21 @@ export const reachAgent: AgentDefinition = {
   // only the name; channel/status stay server-locked in the proposer's insert path.
   async extraCandidates(service, orgId, built): Promise<Candidate[]> {
     if (!built.trend) return [];
-    if (!(await noRecentFormProposal(service, orgId))) return [];
+    const out: Candidate[] = [];
+    // Needs a connected Meta Page; saved as a draft only, so approving it never posts anything.
+    if (await canOfferPostDraft(service, orgId)) {
+      out.push({
+        action: 'createFacebookPostDraft',
+        input: {},
+        title: "Draft a Facebook Page post from this week's trend",
+        detail: 'Saved as a draft. Nothing is posted until you publish it from Ad Settings.',
+        fillInput: (text) => ({ message: text?.trim() ?? '' }),
+        detailFor: (input) => approvalDetail('createFacebookPostDraft', input),
+      });
+    }
+    if (!(await noRecentFormProposal(service, orgId))) return out;
     return [
+      ...out,
       {
         action: 'createForm',
         input: {},
@@ -184,6 +222,7 @@ export const reachAgent: AgentDefinition = {
     updateAppointment: entry(updateAppointmentInput, updateAppointment),
     setAppointmentStatus: entry(setAppointmentStatusInput, setAppointmentStatus),
     createForm: entry(createFormInput, createForm),
+    createFacebookPostDraft: entry(createFacebookPostDraftInput, createFacebookPostDraft),
     updateForm: entry(updateFormInput, updateForm),
   },
 
@@ -204,6 +243,10 @@ export const reachAgent: AgentDefinition = {
   proposals: {
     pickPrompt: (context, list, trend) =>
       [
+        // Only when a post is on offer, so the prompt is otherwise exactly as it was.
+        ...(list.includes('Facebook Page post')
+          ? ['If a candidate is about a Facebook Page post, its "name" must be the full post text itself: friendly, specific to this week\'s market angles, under 400 characters, no more than two hashtags, no invented offers, prices or dates.']
+          : []),
         'You help a small business owner decide which suggested CRM changes are worth queueing for their approval.',
         'Choose ONLY from the numbered candidates below. Do not invent new items or change them.',
         'Reply with JSON only: an array of {"index": number, "rationale": string} objects, where rationale is one short sentence.',
@@ -218,10 +261,13 @@ export const reachAgent: AgentDefinition = {
   },
 
   async media(mctx: MediaContext): Promise<{ cost_cents: number }> {
-    const { apiKey, context, maxCost, costSoFar, reserve, service, orgId, runId } = mctx;
+    const { apiKey, falKey, context, maxCost, costSoFar, reserve, service, orgId, runId } = mctx;
     // Track only what this step ADDS (summed directly, never costSoFar−derived) so the
     // rollup the worker adds back is bit-exact; reserve books the absolute costSoFar+added.
     let added = 0;
+    // Posters and clips come from fal.ai or OpenRouter. A workspace on another provider's key with no fal.ai key has
+    // neither, so it gets the digest and suggestions without failed image attempts.
+    if (!falKey && isDirectKey(apiKey)) return { cost_cents: 0 };
 
     const recordAsset = async (
       kind: 'poster' | 'image',
@@ -242,7 +288,9 @@ export const reachAgent: AgentDefinition = {
       const path = `${orgId}/${runId}/${step.kind}.png`;
       await reserve(costSoFar + added + IMAGE_ESTIMATE_CENTS);
       try {
-        const img = await generateImage(apiKey, step.prompt(context));
+        const img = falKey
+          ? await fal.generateImage(falKey, step.prompt(context))
+          : await generateImage(apiKey, step.prompt(context));
         added += costOr(img.cost_cents, IMAGE_ESTIMATE_CENTS);
         const { error: upErr } = await service.storage
           .from('agent-assets')
@@ -259,10 +307,10 @@ export const reachAgent: AgentDefinition = {
     if (costSoFar + added + VIDEO_ESTIMATE_CENTS <= maxCost) {
       await reserve(costSoFar + added + VIDEO_ESTIMATE_CENTS);
       try {
-        const video = await startVideo(
-          apiKey,
-          `A short, upbeat 6-second promotional clip for a small business's weekly marketing update, no text overlays. Business snapshot:\n${context}`,
-        );
+        const videoPrompt = `A short, upbeat 6-second promotional clip for a small business's weekly marketing update, no text overlays. Business snapshot:\n${context}`;
+        const video = falKey
+          ? await fal.startVideo(falKey, videoPrompt)
+          : await startVideo(apiKey, videoPrompt);
         // The real cost is only known when the clip finishes, after this run has ended. Book
         // it now (the estimate, unless submit already named a figure) on both the run and the
         // asset; pollVideos settles the difference later.

@@ -96,7 +96,7 @@ export function buildCsp({ nonce, supabaseUrl, isDev }: CspInput): string {
     ['script-src', ["'self'", `'nonce-${nonce}'`, "'strict-dynamic'", isDev && "'unsafe-eval'"]],
     ['style-src', ["'self'", "'unsafe-inline'"]],
     // data: the two-factor QR code and attached images; blob: local previews.
-    ['img-src', ["'self'", 'data:', 'blob:', supabase?.http]],
+    ['img-src', ["'self'", 'data:', 'blob:', supabase?.http, 'https://*.fal.media', 'https://fal.media']],
     ['media-src', ["'self'", 'blob:', supabase?.http]],
     // next/font serves the fonts from this origin.
     ['font-src', ["'self'"]],

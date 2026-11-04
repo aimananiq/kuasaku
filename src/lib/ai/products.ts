@@ -8,6 +8,7 @@
  * rule is taken from which side a tool is on, never from a list kept elsewhere.
  */
 
+import { createMetaTools, META_WRITE_TOOL_NAMES } from '@/lib/ai/meta-tools';
 import { deletionCheckFor, type Decision, type DeletionCheck, type DeletionGate } from '@/lib/ai/hire-deletions';
 import { makeFinanceIdCheck } from '@/lib/ai/finance-id-gate';
 import { revalidateFinance } from '@/lib/ai/finance-revalidate';
@@ -23,6 +24,7 @@ import {
   type PeopleWrite,
 } from '@/lib/ai/people-tools';
 import { createReachTools, type ReachWrite } from '@/lib/ai/tools';
+import { createSharedTools, SHARED_TOOL_NAMES, type SharedToolContext } from '@/lib/ai/shared-tools';
 import { NOT_PREPARED, NOT_WAITING, memoryProposalStore, type ProposalStore } from '@/lib/chat/proposal-store';
 import type { HireWriteContext } from '@/lib/hire/capabilities';
 import type { CvReader } from '@/lib/hire/cv-read';
@@ -216,15 +218,18 @@ function split(all: ToolSet, writeNames: readonly string[]): Pick<ProductToolkit
   return { read, write };
 }
 
-/** Jebat: ads, leads, lead forms, creatives and ad settings. */
-export function reachProduct(reach: ReachAccess): ProductToolkit {
+/** Jebat: ads, leads, lead forms, creatives, ad settings, and shared capabilities (fal.ai images, landing pages). */
+export function reachProduct(reach: ReachAccess, sharedCtx?: SharedToolContext): ProductToolkit {
   const all = createReachTools(reach.data, () => new Date(), reach.write);
-  return { key: 'reach', name: 'Jebat', ...split(all, REACH_WRITE_TOOL_NAMES) };
+  const shared = sharedCtx ? createSharedTools({ ...sharedCtx, agent: 'jebat' }) : {};
+  return { key: 'reach', name: 'Jebat', ...split({ ...all, ...shared }, REACH_WRITE_TOOL_NAMES) };
 }
 
-/** Kasturi: CRM contacts, deals, pipelines, follow-ups and the calendar. */
-export function crmProduct(crm: CrmAccess): ProductToolkit {
-  return { key: 'crm', name: 'Kasturi', ...split(createCrmTools(crm), CRM_WRITE_TOOL_NAMES) };
+/** Kasturi: CRM contacts, deals, pipelines, follow-ups, the calendar, and shared capabilities. */
+export function crmProduct(crm: CrmAccess, sharedCtx?: SharedToolContext): ProductToolkit {
+  const all = createCrmTools(crm);
+  const shared = sharedCtx ? createSharedTools({ ...sharedCtx, agent: 'kasturi' }) : {};
+  return { key: 'crm', name: 'Kasturi', ...split({ ...all, ...shared }, CRM_WRITE_TOOL_NAMES) };
 }
 
 /** Lekir: jobs, candidates, applications and interviews. */
@@ -287,6 +292,23 @@ export function kasturiSharedProduct(reach: ReachAccess): ProductToolkit {
   return { key: 'reach', name: 'Kasturi', ...split(shared, REACH_WRITE_TOOL_NAMES) };
 }
 
+/** Jebat's Meta tools: reads run freely, every change waits for approval. None of them can activate paid spend. */
+export function metaProduct(ctx: SharedToolContext): ProductToolkit {
+  const all = createMetaTools({ client: ctx.client, orgId: ctx.orgId, userId: ctx.userId ?? null, role: ctx.role ?? null, canWrite: ctx.canWrite });
+  return { key: 'reach', name: 'Jebat', ...split(all, META_WRITE_TOOL_NAMES) };
+}
+
+/** Shared tools available to both Jebat and Kasturi (image generation, landing page creation, etc.) */
+export function sharedProduct(ctx: SharedToolContext): ProductToolkit {
+  const tools = createSharedTools(ctx);
+  return {
+    key: ctx.agent === 'jebat' ? 'reach' : 'crm',
+    name: ctx.agent === 'jebat' ? 'Jebat' : 'Kasturi',
+    read: tools,
+    write: {},
+  };
+}
+
 /**
  * One agent's tools from several products. Two products must not use the same
  * tool name: the second would silently replace the first.
@@ -299,7 +321,13 @@ export function combineToolkits(products: ProductToolkit[]): {
   const toolApproval: Record<string, 'user-approval'> = {};
   for (const product of products) {
     for (const [name, tool] of Object.entries({ ...product.read, ...product.write })) {
-      if (name in tools) throw new Error(`Two products both have a tool called ${name}.`);
+      if (name in tools) {
+        if ((SHARED_TOOL_NAMES as readonly string[]).includes(name)) {
+          // Shared capability across multiple agents (Jebat & Kasturi); skip re-adding without throwing.
+          continue;
+        }
+        throw new Error(`Two products both have a tool called ${name}.`);
+      }
       tools[name] = tool;
     }
     for (const name of Object.keys(product.write)) toolApproval[name] = 'user-approval';

@@ -5,7 +5,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { AiKeyForm, SavedAiKeyRow } from '@/components/account/ai-key-form';
-import { isAiProvider, type AiProvider } from '@/lib/ai/providers';
+import { isKeyProvider, type KeyProvider } from '@/lib/ai/providers';
 import { ReadOnlyNotice } from '@/components/account/settings-form';
 import { getChatStatus } from '@/lib/ai/gate';
 import { hasKeySecret } from '@/lib/ai/key-crypto';
@@ -27,8 +27,8 @@ export default async function AiKeyPage() {
     key_hint: string;
     is_active: boolean;
   }[]).flatMap((r) =>
-    isAiProvider(r.provider)
-      ? [{ provider: r.provider as AiProvider, hint: r.key_hint, active: r.is_active }]
+    isKeyProvider(r.provider)
+      ? [{ provider: r.provider as KeyProvider, hint: r.key_hint, active: r.is_active }]
       : [],
   );
 
@@ -65,8 +65,10 @@ export default async function AiKeyPage() {
               assistants.
             </p>
             <p>
-              Reading receipts, and the agents&apos; images and video, use
-              OpenRouter. They need an OpenRouter key in use.
+              Reading receipts uses OpenRouter, so it needs an OpenRouter key in
+              use. The agents&apos; images and video are made on fal.ai when you
+              add a fal.ai key (it is saved beside the others and never used for
+              chat), otherwise on OpenRouter.
             </p>
           </CardContent>
         </Card>

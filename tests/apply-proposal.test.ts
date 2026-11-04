@@ -56,10 +56,11 @@ describe('runProposalAction', () => {
     expect(res).toEqual({ ok: false, error: 'That action is not allowed.' });
   });
 
-  it("reach's allow-list is exactly the seven non-destructive actions", () => {
+  it("reach's allow-list is exactly the eight non-destructive actions", () => {
     expect(Object.keys(actionsFor('reach', AGENTS)).sort()).toEqual(
       [
         'createAppointment',
+        'createFacebookPostDraft',
         'createForm',
         'promoteLeadToContact',
         'setAppointmentStatus',

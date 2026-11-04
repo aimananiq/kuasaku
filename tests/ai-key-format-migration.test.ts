@@ -72,9 +72,9 @@ describe('workspace AI key format migration', () => {
     expect(files.filter((f) => f.includes('ai_key_format_check'))).toEqual([FILE]);
     expect(files.filter((f) => f.startsWith(FILE.slice(0, 14)))).toEqual([FILE]);
     expect(files.indexOf(FILE)).toBeGreaterThan(files.indexOf(BROKEN));
-    // Only the multi-provider migration redefines the function after it (adding a provider); it keeps the same
+    // Only the later provider migrations redefine the function after it (the last adds media providers); it keeps the same
     // format checks, which the next test applies to it as well.
-    expect(newestFunctions().get('public.set_org_ai_key')?.file).toBe('20261201090000_ai_keys_multi_provider.sql');
+    expect(newestFunctions().get('public.set_org_ai_key')?.file).toBe('20261204090000_ai_keys_media_provider.sql');
   });
 
   test('the sealed value is matched by shape and capped by length, with no bound above 255', () => {

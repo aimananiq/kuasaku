@@ -70,7 +70,16 @@ function fakeService(
               return b;
             },
             then: (resolve: (v: { data: never[] }) => void) => resolve({ data: [] }),
-            maybeSingle: async () => ({ data: table === 'agent_configs' ? cap : keyRow, error: null }),
+            maybeSingle: async () => ({
+              // A fal key is a separate row; these tests have none, so they run on the chat key.
+              data:
+                table === 'agent_configs'
+                  ? cap
+                  : call.eqs.some(([c, v]) => c === 'provider' && v === 'fal')
+                    ? null
+                    : keyRow,
+              error: null,
+            }),
           };
           return b;
         },

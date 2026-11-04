@@ -10,6 +10,8 @@ export type Capability =
   | 'manage-members'
   | 'manage-ai-key'
   | 'manage-email-key'
+  | 'manage-ads-account'
+  | 'approve-ad-spend'
   | 'send-broadcasts'
   | 'manage-agents'
   | 'manage-developers'
@@ -33,6 +35,8 @@ export const PERMISSIONS: {
   { capability: 'manage-members', label: 'Invite & manage members', allow: ['owner', 'admin'] },
   { capability: 'manage-ai-key', label: 'Manage the workspace AI key', allow: ['owner', 'admin'] },
   { capability: 'manage-email-key', label: 'Manage the workspace email key', allow: ['owner', 'admin'] },
+  { capability: 'manage-ads-account', label: 'Connect & manage the Meta ad account', allow: ['owner', 'admin'] },
+  { capability: 'approve-ad-spend', label: 'Approve paid ad activation', allow: ['owner', 'admin'] },
   // Kept in step with public.crm_begin_broadcast_send in the database, which is what enforces it.
   { capability: 'send-broadcasts', label: 'Send broadcasts by email', allow: ['owner', 'admin'] },
   { capability: 'manage-agents', label: 'Manage AI agents & their spend', allow: ['owner', 'admin'] },

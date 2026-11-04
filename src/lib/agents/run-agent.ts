@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { webSearch, writeDigest } from '@/lib/agents/openrouter-media';
+import { readMediaKey } from '@/lib/ai/media-key';
 import { TEXT_ESTIMATE_CENTS, costOr } from '@/lib/agents/costs';
 import { proposeChanges } from '@/lib/agents/proposer';
 import { RunInProgressError, type AgentRunStatus, type AgentRunTrigger } from '@/lib/agents/types';
@@ -115,8 +116,10 @@ export async function runAgent(
     // Optional poster/hero/video. The step tracks its own running cost from `cost` and
     // reserves absolute totals via the same `reserve`; it returns the real cost it added.
     if (def.media) {
+      const falKey = (await readMediaKey(service, orgId, 'fal')) ?? undefined;
       const media = await def.media({
         apiKey,
+        falKey,
         context,
         maxCost,
         costSoFar: cost,

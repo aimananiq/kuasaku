@@ -54,7 +54,8 @@ const EXPECTED: Record<string, { cards: number; withIcon: number }> = {
   'screens/finance/settings': { cards: 7, withIcon: 7 },
   'screens/people/settings': { cards: 3, withIcon: 3 },
   'screens/hire/settings': { cards: 1, withIcon: 1 },
-  'screens/reach/ad-settings': { cards: 2, withIcon: 2 },
+  'screens/reach/ad-settings': { cards: 1, withIcon: 1 },
+  'components/reach/meta-connection-card': { cards: 1, withIcon: 1 },
   'components/reach/ad-settings-form': { cards: 2, withIcon: 2 },
   'screens/crm/settings-view': { cards: 5, withIcon: 5 },
   // Account → Developers.

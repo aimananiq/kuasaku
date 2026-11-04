@@ -80,10 +80,24 @@ export default async function PublicLandingPage({ params }: Props) {
   const chatbot = await getPublicChatbot(id);
 
   // Blank lines in the text separate paragraphs; single line breaks are kept.
-  const paragraphs = (page.body ?? '')
+  const rawParagraphs = (page.body ?? '')
     .split(/\n{2,}/)
     .map((paragraph) => paragraph.trim())
     .filter(Boolean);
+
+  // Extract hero image if present in the first few paragraphs
+  const imageRegex = /^!\[(.*?)\]\((https:\/\/[^\s)]+)\)$/;
+  let heroImage: { alt: string; url: string } | null = null;
+  const contentParagraphs: string[] = [];
+
+  for (const para of rawParagraphs) {
+    const match = para.match(imageRegex);
+    if (match && !heroImage) {
+      heroImage = { alt: match[1] || 'Hero Visual', url: match[2] };
+    } else {
+      contentParagraphs.push(para);
+    }
+  }
 
   return (
     <div className="flex min-h-dvh w-full flex-col bg-muted/40">
@@ -95,13 +109,75 @@ export default async function PublicLandingPage({ params }: Props) {
             <p className="text-lg text-muted-foreground break-words">{page.subheadline}</p>
           ) : null}
         </header>
-        {paragraphs.length > 0 ? (
-          <div className="space-y-3 text-base leading-relaxed break-words">
-            {paragraphs.map((paragraph, index) => (
-              <p key={index} className="whitespace-pre-line">
-                {paragraph}
-              </p>
-            ))}
+
+        {/* Hero Visual Asset */}
+        {heroImage ? (
+          <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={heroImage.url}
+              alt={heroImage.alt}
+              className="h-auto w-full max-h-[440px] rounded-xl object-cover"
+              loading="lazy"
+            />
+          </div>
+        ) : null}
+
+        {contentParagraphs.length > 0 ? (
+          <div className="space-y-4 text-base leading-relaxed break-words">
+            {contentParagraphs.map((paragraph, index) => {
+              // Section header 2
+              if (paragraph.startsWith('## ')) {
+                return (
+                  <h2 key={index} className="pt-2 text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+                    {paragraph.replace(/^## /, '')}
+                  </h2>
+                );
+              }
+              // Section header 3
+              if (paragraph.startsWith('### ')) {
+                return (
+                  <h3 key={index} className="text-lg font-semibold text-foreground">
+                    {paragraph.replace(/^### /, '')}
+                  </h3>
+                );
+              }
+              // Blockquote / Testimonials
+              if (paragraph.startsWith('> ')) {
+                const quoteText = paragraph.replace(/^>\s*/gm, '');
+                return (
+                  <blockquote
+                    key={index}
+                    className="rounded-lg border-l-4 border-primary bg-card/60 p-4 italic text-muted-foreground shadow-xs"
+                  >
+                    {quoteText}
+                  </blockquote>
+                );
+              }
+              // Bullet lists (benefits / highlights)
+              if (paragraph.startsWith('* ') || paragraph.startsWith('- ')) {
+                const items = paragraph.split('\n').filter(Boolean);
+                return (
+                  <ul key={index} className="space-y-1.5 pl-2">
+                    {items.map((item, itemIdx) => {
+                      const cleanItem = item.replace(/^[*•-]\s*/, '');
+                      return (
+                        <li key={itemIdx} className="flex items-start gap-2 text-muted-foreground">
+                          <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                          <span>{cleanItem}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                );
+              }
+              // Default paragraph
+              return (
+                <p key={index} className="whitespace-pre-line text-muted-foreground">
+                  {paragraph}
+                </p>
+              );
+            })}
           </div>
         ) : null}
         <section className="rounded-xl border bg-card p-6 text-card-foreground shadow-sm sm:p-8">

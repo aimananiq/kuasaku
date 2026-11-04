@@ -20,6 +20,8 @@ export type Candidate = {
    */
   checkKey?: string;
   fillInput?: (name: string | undefined) => unknown;
+  /** The detail line built from the final input, when the model's text is what the owner needs to read. */
+  detailFor?: (input: unknown) => string | null;
 };
 
 /**
@@ -71,6 +73,8 @@ export type BuiltContext = { context: string; raw: unknown; trend?: string };
  */
 export type MediaContext = {
   apiKey: string;
+  /** The workspace's fal.ai key, when it saved one: images and video are made there instead of on `apiKey`. */
+  falKey?: string;
   context: string;
   maxCost: number;
   costSoFar: number;

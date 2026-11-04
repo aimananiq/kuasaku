@@ -61,7 +61,7 @@ function secretKey(env: EnvLike): Buffer {
  * can never be read back as its AI key, or the other way round. An MCP API
  * key's session refresh token is sealed for its own purpose too.
  */
-export type KeyPurpose = 'org-ai-key' | 'org-email-key' | 'mcp-refresh-token';
+export type KeyPurpose = 'org-ai-key' | 'org-email-key' | 'mcp-refresh-token' | 'org-meta-token';
 
 /**
  * The bytes authenticated with a v2 key. An empty or malformed id would be no

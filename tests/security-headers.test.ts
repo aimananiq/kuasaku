@@ -48,7 +48,8 @@ describe('buildCsp', () => {
     expect(csp.get('default-src')).toEqual(["'self'"]);
     expect(csp.get('script-src')).toEqual(["'self'", "'nonce-Tm9uY2U='", "'strict-dynamic'"]);
     expect(csp.get('style-src')).toEqual(["'self'", "'unsafe-inline'"]);
-    expect(csp.get('img-src')).toEqual(["'self'", 'data:', 'blob:', SUPABASE]);
+    // fal.ai's CDN is allowed to show a generated ad image for approval before it is sent to Meta.
+    expect(csp.get('img-src')).toEqual(["'self'", 'data:', 'blob:', SUPABASE, 'https://*.fal.media', 'https://fal.media']);
     expect(csp.get('media-src')).toEqual(["'self'", 'blob:', SUPABASE]);
     expect(csp.get('font-src')).toEqual(["'self'"]);
     expect(csp.get('connect-src')).toEqual(["'self'", SUPABASE, 'wss://abcdefgh.supabase.co']);
@@ -74,10 +75,11 @@ describe('buildCsp', () => {
   it('names no outside origin when there is no database', () => {
     for (const supabaseUrl of [undefined, '', 'not a url']) {
       const policy = buildCsp({ nonce: 'n', supabaseUrl, isDev: false });
-      expect(policy).not.toMatch(/undefined|null|https?:|wss?:/);
+      // The only outside origin without a database is fal.ai's image CDN.
+      expect(policy.replace(/https:\/\/(\*\.)?fal\.media/g, '')).not.toMatch(/undefined|null|https?:|wss?:/);
       const csp = parse(policy);
       expect(csp.get('connect-src')).toEqual(["'self'"]);
-      expect(csp.get('img-src')).toEqual(["'self'", 'data:', 'blob:']);
+      expect(csp.get('img-src')).toEqual(["'self'", 'data:', 'blob:', 'https://*.fal.media', 'https://fal.media']);
     }
   });
 

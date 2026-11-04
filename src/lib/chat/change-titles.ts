@@ -1753,6 +1753,7 @@ export function approvalTitle(
     case 'deleteCreative': return `Delete ${the('creative', 'creative')}?`;
     case 'updateAdSettings': return 'Update ad settings?';
     case 'createForm': return `Create lead form “${i.name ?? ''}”?`;
+    case 'createFacebookPostDraft': return 'Save a Facebook post draft?';
     case 'updateForm': return `Save changes to ${the('lead form', 'form')}?`;
     case 'setFormStatus':
       return i.status === 'active'
@@ -2248,6 +2249,9 @@ export function approvalDetail(
   named?: NameFinder,
 ): string | null {
   const i = (input && typeof input === 'object' ? input : {}) as Record<string, unknown>;
+  if (toolName === 'createFacebookPostDraft') {
+    return typeof i.message === 'string' ? `“${i.message.slice(0, 280)}” — saved as a draft; nothing is posted.` : null;
+  }
   if (toolName === 'deleteEmployee') {
     return 'Their leave, claims, draft payslips and every other HR record are deleted too, including their documents, the files attached to them and their letters. This cannot be undone. Someone with a paid payslip cannot be deleted: make them inactive instead.';
   }

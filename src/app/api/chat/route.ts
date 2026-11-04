@@ -43,7 +43,7 @@ export async function POST(request: Request) {
   // Tuah answers with its team unless the chat asked for the single agent.
   // A turn resuming after an approval stays with whichever one started it.
   const withTeam = answersWithTeam(chat.team, lastMessage);
-  const { reach, crm, hire, people, finance } = await buildTuahAccess({
+  const { reach, crm, hire, people, finance, sharedContext } = await buildTuahAccess({
     supabase,
     org,
     userId: chat.userId,
@@ -87,6 +87,7 @@ export async function POST(request: Request) {
     people,
     finance,
     approvals,
+    sharedContext,
   );
   void result.consumeStream();
 
