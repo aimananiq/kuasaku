@@ -9,6 +9,8 @@ import { SUBMISSION_MESSAGES } from '@/lib/reach/form-submissions';
 import { countFormView } from '@/lib/reach/form-views';
 import { createAnonymousClient, getPublicForm } from '@/lib/reach/public-forms';
 import { createClient } from '@/lib/supabase/server';
+import { serviceClient } from '@/lib/supabase/service';
+import { isShowableImage } from '@/lib/media/persist-image';
 import { submitPublicFormAction } from './actions';
 
 /**
@@ -63,8 +65,14 @@ export default async function PublicFormPage({ params }: Props) {
   // who is only previewing their form is left out. One view per client per window.
   await countFormView(await createClient(), id);
 
+  const banner = await loadBanner(id);
+
   return (
     <PublicFormShell>
+      {banner ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={banner} alt="" className="mb-6 h-44 w-full rounded-2xl border object-cover shadow-sm sm:h-56" />
+      ) : null}
       <header className="mb-6 space-y-1">
         <p className="text-sm text-muted-foreground">{form.orgName}</p>
         <h1 className="text-2xl font-bold tracking-tight break-words">{form.name}</h1>
@@ -75,4 +83,18 @@ export default async function PublicFormPage({ params }: Props) {
       />
     </PublicFormShell>
   );
+}
+
+/**
+ * The banner picture, read with the server's credential and only for a form that is open (the caller has checked).
+ * A missing table row, a failed read or an image the workspace does not own all mean no banner, never an error.
+ */
+async function loadBanner(formId: string): Promise<string | null> {
+  try {
+    const { data } = await serviceClient().from('form_banners').select('image_url, org_id').eq('form_id', formId).maybeSingle();
+    const row = data as { image_url: string; org_id: string } | null;
+    return row && isShowableImage(row.image_url, row.org_id) ? row.image_url : null;
+  } catch {
+    return null;
+  }
 }

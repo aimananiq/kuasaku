@@ -24,6 +24,7 @@ import {
   type FalJobStatus,
 } from '@/lib/ai/fal-provider';
 import { serviceClient } from '@/lib/supabase/service';
+import { craftImagePrompt, isShowableImage, persistGeneratedImage } from '@/lib/media/persist-image';
 
 /* -------------------------------------------------------------------------
  * Audit Logging (Zero Credential Leakage)
@@ -76,8 +77,13 @@ export const SHARED_TOOL_NAMES = [
   'save_landing_page',
   'create_lead_form',
   'connect_form_to_crm',
+  'publish_landing_page',
+  'unpublish_landing_page',
   'delegate_to_agent',
 ] as const;
+
+/** Changes that put something in front of the public (or take it down): each waits for the owner's approval. */
+export const SHARED_WRITE_TOOL_NAMES = ['publish_landing_page', 'unpublish_landing_page'] as const;
 
 export type SharedToolName = (typeof SHARED_TOOL_NAMES)[number];
 
@@ -91,6 +97,8 @@ export const AGENT_CAPABILITY_MATRIX = {
     save_landing_page: true,
     create_lead_form: true,
     connect_form_to_crm: true,
+    publish_landing_page: true,
+    unpublish_landing_page: true,
     delegate_to_agent: true,
   },
   kasturi: {
@@ -102,6 +110,8 @@ export const AGENT_CAPABILITY_MATRIX = {
     save_landing_page: true,
     create_lead_form: true,
     connect_form_to_crm: true,
+    publish_landing_page: true,
+    unpublish_landing_page: true,
     delegate_to_agent: true,
   },
 } as const;
@@ -162,6 +172,7 @@ export const generateImageInputSchema = z.object({
   project_id: z.string().optional().describe('Project identifier'),
   landing_page_id: z.string().optional().describe('Target landing page id to link with'),
   output_format: z.enum(['webp', 'jpeg', 'png']).optional().default('webp'),
+  channel: z.enum(['whatsapp', 'facebook', 'instagram', 'tiktok']).optional().describe('Where the picture will be used, for the Creative Bank'),
 });
 
 export const getImageStatusInputSchema = z.object({
@@ -189,7 +200,7 @@ export const generateLandingPageInputSchema = z.object({
   hero_image_url: z.string().optional().describe('Existing generated image URL if already available'),
   cta_text: z.string().max(40).optional().default('Register Now').describe('Call to action button label'),
   lead_form_id: z.string().optional().describe('Lead form ID to connect with this page'),
-  status: z.enum(['draft', 'published']).optional().default('draft'),
+  status: z.enum(['draft']).optional().default('draft').describe('Always a draft: publishing is a separate step that needs the owner\'s approval (publish_landing_page)'),
 });
 
 export const updateLandingPageInputSchema = z.object({
@@ -201,7 +212,7 @@ export const updateLandingPageInputSchema = z.object({
   hero_image_url: z.string().optional(),
   button_label: z.string().max(40).optional(),
   form_id: z.string().optional(),
-  status: z.enum(['draft', 'published']).optional(),
+  status: z.enum(['draft']).optional().describe('Drafts only; use publish_landing_page to publish'),
   chat_enabled: z.boolean().optional(),
 });
 
@@ -221,7 +232,7 @@ export const saveLandingPageInputSchema = z.object({
   body: z.string().max(4000).optional().describe('Formatted content with sections and hero image markdown'),
   button_label: z.string().max(40).optional().default('Register Now'),
   form_id: z.string().optional().describe('Connected lead form UUID'),
-  status: z.enum(['draft', 'published']).optional().default('draft'),
+  status: z.enum(['draft']).optional().default('draft').describe('Drafts only; use publish_landing_page to publish'),
   chat_enabled: z.boolean().optional().default(false),
 });
 
@@ -229,8 +240,13 @@ export const createLeadFormInputSchema = z.object({
   name: z.string().min(1).max(120).describe('Name of the lead capture form'),
   category: z.string().max(60).optional().describe('Form category tag'),
   slug: z.string().max(60).optional().describe('URL slug for direct sharing'),
-  status: z.enum(['draft', 'active', 'paused']).optional().default('active'),
+  status: z.enum(['draft']).optional().default('draft').describe('Forms start as drafts; activate with setFormStatus after the owner approves'),
   consent_text: z.string().max(300).optional(),
+  banner_image_url: z.string().url().optional().describe('A picture from generate_image, shown at the top of the form page'),
+});
+
+export const publishLandingPageInputSchema = z.object({
+  page_id: z.string().uuid().describe('UUID of the saved landing page to publish'),
 });
 
 export const connectFormToCrmInputSchema = z.object({
@@ -252,6 +268,12 @@ export const delegateToAgentInputSchema = z.object({
 /* -------------------------------------------------------------------------
  * Shared Tool Builder
  * ------------------------------------------------------------------------- */
+
+/** The first markdown image in `body` that a page may not show (an outside image can track visitors). */
+export function unshowableImage(body: string | null | undefined, orgId: string): string | null {
+  for (const m of (body ?? '').matchAll(/!\[[^\]]*\]\(([^)\s]+)\)/g)) if (!isShowableImage(m[1], orgId)) return m[1].slice(0, 80);
+  return null;
+}
 
 export function createSharedTools(ctx: SharedToolContext): ToolSet {
   const { agent, client, orgId, userId, canWrite } = ctx;
@@ -296,7 +318,7 @@ export function createSharedTools(ctx: SharedToolContext): ToolSet {
           }
 
           const result = await generateFalImage(falKey, {
-            prompt: input.prompt,
+            prompt: craftImagePrompt(input.prompt, input.image_purpose),
             image_size: input.image_size,
             model: input.model,
             num_images: input.num_images,
@@ -310,15 +332,34 @@ export function createSharedTools(ctx: SharedToolContext): ToolSet {
 
           const assetId = `asset_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
           let storageReference: string | null = null;
-
-          // Attempt durable storage persistence if service client has access
+          // The provider's URL is temporary. Keep our own copy, so a page, form, post or ad that uses the picture
+          // does not break when it lapses. If that fails the temporary URL is still returned, and the reply says so.
+          let finalUrl = result.url;
+          let durable = false;
           try {
-            const sClient = serviceClient();
-            const storagePath = `${orgId}/generated/${assetId}.${input.output_format || 'webp'}`;
-            // Optional background upload
-            storageReference = storagePath;
+            const saved = await persistGeneratedImage(serviceClient(), orgId, result.url);
+            if (saved.ok) {
+              finalUrl = saved.url;
+              storageReference = saved.path;
+              durable = true;
+            }
           } catch {
-            storageReference = result.url;
+            // Storage is not configured here: fall through with the provider's URL.
+          }
+          // Jebat's Creative Bank keeps every generated picture, for either agent. A failed note is not a failed image.
+          let creativeId: string | null = null;
+          if (canWrite) {
+            try {
+              const label = (input.image_purpose?.trim() || input.prompt.trim()).slice(0, 80);
+              const { data: creative } = await client
+                .from('creatives')
+                .insert({ org_id: orgId, name: label || 'Generated image', type: 'image', channel: input.channel ?? 'facebook', status: 'draft', body: finalUrl })
+                .select('id')
+                .single();
+              creativeId = (creative as { id?: string } | null)?.id ?? null;
+            } catch {
+              creativeId = null;
+            }
           }
 
           // Register in job tracker
@@ -328,7 +369,7 @@ export function createSharedTools(ctx: SharedToolContext): ToolSet {
             status: 'completed',
             prompt: result.prompt,
             model: result.model,
-            imageUrl: result.url,
+            imageUrl: finalUrl,
             storagePath: storageReference ?? undefined,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
@@ -346,7 +387,10 @@ export function createSharedTools(ctx: SharedToolContext): ToolSet {
             ok: true,
             status: 'completed',
             asset_id: assetId,
-            url: result.url,
+            url: finalUrl,
+            durable,
+            creative_bank_id: creativeId,
+            durable_note: durable ? undefined : 'This link is temporary (the image could not be saved). Generate it again before publishing.',
             model: result.model,
             prompt: result.prompt,
             width: result.width,
@@ -561,10 +605,14 @@ export function createSharedTools(ctx: SharedToolContext): ToolSet {
           body: input.body || null,
           button_label: input.button_label || 'Register Now',
           form_id: input.form_id || null,
-          status: input.status || 'draft',
+          // Never published from here: that is publish_landing_page, which waits for approval.
+          status: 'draft' as const,
           chat_enabled: input.chat_enabled ?? false,
           created_by: userId || null,
         };
+
+        const badImage = unshowableImage(row.body, orgId);
+        if (badImage) return { ok: false, error: `The page shows an image that is not one of this workspace's generated images (${badImage}). Use generate_image and its URL.` };
 
         let pageId = input.page_id;
 
@@ -621,6 +669,7 @@ export function createSharedTools(ctx: SharedToolContext): ToolSet {
 
         const slug = input.slug || input.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 60);
 
+        // Only the columns a form has and a member may write (no `created_by`: the table has none).
         const { data, error } = await client
           .from('forms')
           .insert({
@@ -628,9 +677,8 @@ export function createSharedTools(ctx: SharedToolContext): ToolSet {
             name: input.name,
             category: input.category || null,
             slug,
-            status: input.status || 'active',
-            consent_text: input.consent_text || 'I agree to be contacted regarding this programme.',
-            created_by: userId || null,
+            status: 'draft',
+            consent_text: input.consent_text || 'I agree that {workspace} may keep these details and contact me about my enquiry.',
           })
           .select('id, name, slug, status')
           .single();
@@ -640,6 +688,19 @@ export function createSharedTools(ctx: SharedToolContext): ToolSet {
           return { ok: false, error: error?.message || 'Could not create lead form.' };
         }
 
+        let bannerSaved = false;
+        if (input.banner_image_url) {
+          if (!isShowableImage(input.banner_image_url, orgId)) {
+            return { ok: true, form_id: data.id, name: data.name, slug: data.slug, status: data.status, warning: 'The banner was not added: use an image made with generate_image.' };
+          }
+          try {
+            const { error: bErr } = await serviceClient().from('form_banners').upsert({ form_id: data.id, org_id: orgId, image_url: input.banner_image_url });
+            bannerSaved = !bErr;
+          } catch {
+            bannerSaved = false;
+          }
+        }
+
         recordAuditLog({ agent, tool: 'create_lead_form', orgId, status: 'success', details: { formId: data.id } });
         return {
           ok: true,
@@ -647,7 +708,9 @@ export function createSharedTools(ctx: SharedToolContext): ToolSet {
           name: data.name,
           slug: data.slug,
           status: data.status,
-          crm_pipeline_connected: true,
+          public_path: `/f/${data.id}`,
+          banner_saved: bannerSaved,
+          next: 'The form is a draft and not accepting submissions. Ask the owner to approve activating it (setFormStatus).',
         };
       },
     }),
@@ -682,6 +745,42 @@ export function createSharedTools(ctx: SharedToolContext): ToolSet {
           status: 'connected',
           message: 'Lead form successfully linked. All visitor submissions will create leads in Kasturi CRM.',
         };
+      },
+    }),
+
+    publish_landing_page: tool({
+      description:
+        'Publishes a saved landing page so anyone with its link can open it and submit the form. Needs the owner\'s approval. The page must have an active lead form.',
+      inputSchema: publishLandingPageInputSchema,
+      execute: async (input) => {
+        verifyPermission('publish_landing_page');
+        if (!canWrite) return { ok: false, error: 'Your role cannot publish landing pages.' };
+        const { data: page } = await client.from('crm_landing_pages').select('id,headline,form_id,status').eq('id', input.page_id).eq('org_id', orgId).maybeSingle();
+        const p = page as { headline: string; form_id: string | null; status: string } | null;
+        if (!p) return { ok: false, error: 'That landing page was not found in this workspace.' };
+        if (!p.form_id) return { ok: false, error: 'Connect a lead form to the page first (connect_form_to_crm), so visitors can reach Kasturi.' };
+        const { data: form } = await client.from('forms').select('status').eq('id', p.form_id).eq('org_id', orgId).maybeSingle();
+        if ((form as { status?: string } | null)?.status !== 'active') {
+          return { ok: false, error: 'The page\'s lead form is not active, so visitors would see "Page not available". Activate the form first (setFormStatus).' };
+        }
+        const { error } = await client.from('crm_landing_pages').update({ status: 'published', updated_at: new Date().toISOString() }).eq('id', input.page_id).eq('org_id', orgId);
+        if (error) return { ok: false, error: error.message };
+        recordAuditLog({ agent, tool: 'publish_landing_page', orgId, status: 'success', details: { pageId: input.page_id } });
+        return { ok: true, page_id: input.page_id, status: 'published', public_path: `/p/${input.page_id}` };
+      },
+    }),
+
+    unpublish_landing_page: tool({
+      description: 'Takes a published landing page back to draft so visitors can no longer open it. Needs the owner\'s approval.',
+      inputSchema: publishLandingPageInputSchema,
+      execute: async (input) => {
+        verifyPermission('unpublish_landing_page');
+        if (!canWrite) return { ok: false, error: 'Your role cannot change landing pages.' };
+        const { data, error } = await client.from('crm_landing_pages').update({ status: 'draft', updated_at: new Date().toISOString() }).eq('id', input.page_id).eq('org_id', orgId).select('id').maybeSingle();
+        if (error) return { ok: false, error: error.message };
+        if (!data) return { ok: false, error: 'That landing page was not found in this workspace.' };
+        recordAuditLog({ agent, tool: 'unpublish_landing_page', orgId, status: 'success', details: { pageId: input.page_id } });
+        return { ok: true, page_id: input.page_id, status: 'draft' };
       },
     }),
 

@@ -37,6 +37,7 @@ export function fakeSupabase(seed: Record<string, Row[]> = {}, uniques: Record<s
     const b: any = {
       select() { wantRows = true; return b; },
       insert(p: Row) { mode = 'insert'; payload = p; return b; },
+      upsert(p: Row) { mode = 'insert'; payload = p; return b; },
       update(p: Row) { mode = 'update'; payload = p; return b; },
       delete() { mode = 'delete'; return b; },
       eq(c: string, v: unknown) { filters.push((r) => r[c] === v); return b; },

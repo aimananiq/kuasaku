@@ -85,7 +85,7 @@ export default async function PublicLandingPage({ params }: Props) {
     .map((paragraph) => paragraph.trim())
     .filter(Boolean);
 
-  // Extract hero image if present in the first few paragraphs
+  // The first picture is the hero; any other picture stays where the writer put it.
   const imageRegex = /^!\[(.*?)\]\((https:\/\/[^\s)]+)\)$/;
   let heroImage: { alt: string; url: string } | null = null;
   const contentParagraphs: string[] = [];
@@ -100,87 +100,47 @@ export default async function PublicLandingPage({ params }: Props) {
   }
 
   return (
-    <div className="flex min-h-dvh w-full flex-col bg-muted/40">
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10 sm:py-14">
-        <header className="space-y-3">
-          <p className="text-sm font-medium text-muted-foreground">{page.orgName}</p>
-          <h1 className="text-3xl font-bold tracking-tight break-words sm:text-4xl">{page.headline}</h1>
-          {page.subheadline ? (
-            <p className="text-lg text-muted-foreground break-words">{page.subheadline}</p>
-          ) : null}
-        </header>
-
-        {/* Hero Visual Asset */}
+    <div className="flex min-h-dvh w-full flex-col bg-gradient-to-b from-primary/5 via-background to-muted/40">
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-4 py-8 sm:py-12">
         {heroImage ? (
-          <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+          <section className="relative isolate overflow-hidden rounded-3xl border shadow-lg">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={heroImage.url}
-              alt={heroImage.alt}
-              className="h-auto w-full max-h-[440px] rounded-xl object-cover"
-              loading="lazy"
-            />
-          </div>
-        ) : null}
+            <img src={heroImage.url} alt={heroImage.alt} className="h-[340px] w-full object-cover sm:h-[420px]" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/5" />
+            <div className="absolute inset-x-0 bottom-0 space-y-3 p-6 text-white sm:p-10">
+              <p className="text-sm font-medium uppercase tracking-wider text-white/80">{page.orgName}</p>
+              <h1 className="text-3xl font-bold tracking-tight break-words sm:text-5xl">{page.headline}</h1>
+              {page.subheadline ? <p className="max-w-2xl text-base text-white/90 break-words sm:text-lg">{page.subheadline}</p> : null}
+              <a
+                href="#register"
+                className="inline-flex h-11 items-center rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-md transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              >
+                {page.buttonLabel || DEFAULT_BUTTON_LABEL}
+              </a>
+            </div>
+          </section>
+        ) : (
+          <header className="space-y-4 rounded-3xl border bg-gradient-to-br from-primary/10 to-transparent p-6 sm:p-10">
+            <p className="text-sm font-medium uppercase tracking-wider text-muted-foreground">{page.orgName}</p>
+            <h1 className="text-3xl font-bold tracking-tight break-words sm:text-5xl">{page.headline}</h1>
+            {page.subheadline ? <p className="max-w-2xl text-lg text-muted-foreground break-words">{page.subheadline}</p> : null}
+            <a
+              href="#register"
+              className="inline-flex h-11 items-center rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-md transition hover:opacity-90"
+            >
+              {page.buttonLabel || DEFAULT_BUTTON_LABEL}
+            </a>
+          </header>
+        )}
 
         {contentParagraphs.length > 0 ? (
-          <div className="space-y-4 text-base leading-relaxed break-words">
-            {contentParagraphs.map((paragraph, index) => {
-              // Section header 2
-              if (paragraph.startsWith('## ')) {
-                return (
-                  <h2 key={index} className="pt-2 text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-                    {paragraph.replace(/^## /, '')}
-                  </h2>
-                );
-              }
-              // Section header 3
-              if (paragraph.startsWith('### ')) {
-                return (
-                  <h3 key={index} className="text-lg font-semibold text-foreground">
-                    {paragraph.replace(/^### /, '')}
-                  </h3>
-                );
-              }
-              // Blockquote / Testimonials
-              if (paragraph.startsWith('> ')) {
-                const quoteText = paragraph.replace(/^>\s*/gm, '');
-                return (
-                  <blockquote
-                    key={index}
-                    className="rounded-lg border-l-4 border-primary bg-card/60 p-4 italic text-muted-foreground shadow-xs"
-                  >
-                    {quoteText}
-                  </blockquote>
-                );
-              }
-              // Bullet lists (benefits / highlights)
-              if (paragraph.startsWith('* ') || paragraph.startsWith('- ')) {
-                const items = paragraph.split('\n').filter(Boolean);
-                return (
-                  <ul key={index} className="space-y-1.5 pl-2">
-                    {items.map((item, itemIdx) => {
-                      const cleanItem = item.replace(/^[*•-]\s*/, '');
-                      return (
-                        <li key={itemIdx} className="flex items-start gap-2 text-muted-foreground">
-                          <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
-                          <span>{cleanItem}</span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                );
-              }
-              // Default paragraph
-              return (
-                <p key={index} className="whitespace-pre-line text-muted-foreground">
-                  {paragraph}
-                </p>
-              );
-            })}
+          <div className="space-y-5 text-base leading-relaxed break-words">
+            {contentParagraphs.map((paragraph, index) => (
+              <PageBlock key={index} text={paragraph} />
+            ))}
           </div>
         ) : null}
-        <section className="rounded-xl border bg-card p-6 text-card-foreground shadow-sm sm:p-8">
+        <section id="register" className="scroll-mt-6 rounded-2xl border bg-card p-6 text-card-foreground shadow-md sm:p-8">
           <PublicLeadForm
             action={submitLandingPageAction.bind(null, id)}
             consentText={consentText}
@@ -207,5 +167,99 @@ export default async function PublicLandingPage({ params }: Props) {
         />
       ) : null}
     </div>
+  );
+}
+
+
+/** **bold** inside a line of text; nothing else is interpreted, so a page cannot inject markup. */
+function Inline({ text }: { text: string }) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.startsWith('**') && part.endsWith('**') && part.length > 4 ? (
+          <strong key={i} className="font-semibold text-foreground">
+            {part.slice(2, -2)}
+          </strong>
+        ) : (
+          <span key={i}>{part}</span>
+        ),
+      )}
+    </>
+  );
+}
+
+const IMAGE_LINE = /^!\[(.*?)\]\((https:\/\/[^\s)]+)\)$/;
+
+function PageBlock({ text }: { text: string }) {
+  if (text.startsWith('## ')) {
+    return (
+      <h2 className="flex items-center gap-3 pt-4 text-2xl font-bold tracking-tight text-foreground">
+        <span className="h-7 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden />
+        <Inline text={text.slice(3)} />
+      </h2>
+    );
+  }
+  if (text.startsWith('### ')) {
+    return (
+      <h3 className="text-lg font-semibold text-foreground">
+        <Inline text={text.slice(4)} />
+      </h3>
+    );
+  }
+  const image = text.match(IMAGE_LINE);
+  if (image) {
+    return (
+      <figure className="overflow-hidden rounded-2xl border shadow-sm">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={image[2]} alt={image[1]} className="h-auto w-full object-cover" loading="lazy" />
+      </figure>
+    );
+  }
+  if (text.startsWith('> ')) {
+    return (
+      <blockquote className="rounded-xl border-l-4 border-primary bg-card/70 p-5 italic text-muted-foreground shadow-xs">
+        <Inline text={text.replace(/^>\s*/gm, '')} />
+      </blockquote>
+    );
+  }
+  const lines = text.split('\n').filter(Boolean);
+  if (lines.length > 0 && lines.every((l) => /^[*•-]\s+/.test(l))) {
+    // Benefits read as cards, not as a plain list.
+    return (
+      <ul className="grid gap-3 sm:grid-cols-2">
+        {lines.map((l, i) => (
+          <li key={i} className="flex items-start gap-3 rounded-xl border bg-card p-4 shadow-xs">
+            <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground" aria-hidden>
+              ✓
+            </span>
+            <span className="text-foreground/90">
+              <Inline text={l.replace(/^[*•-]\s+/, '')} />
+            </span>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+  if (lines.length > 0 && lines.every((l) => /^\d+[.)]\s+/.test(l))) {
+    return (
+      <ol className="space-y-3">
+        {lines.map((l, i) => (
+          <li key={i} className="flex items-start gap-3">
+            <span className="grid size-7 shrink-0 place-items-center rounded-full bg-primary/10 text-sm font-bold text-primary" aria-hidden>
+              {i + 1}
+            </span>
+            <span className="pt-0.5 text-muted-foreground">
+              <Inline text={l.replace(/^\d+[.)]\s+/, '')} />
+            </span>
+          </li>
+        ))}
+      </ol>
+    );
+  }
+  return (
+    <p className="whitespace-pre-line text-muted-foreground">
+      <Inline text={text} />
+    </p>
   );
 }

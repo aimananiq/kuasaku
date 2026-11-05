@@ -24,7 +24,7 @@ import {
   type PeopleWrite,
 } from '@/lib/ai/people-tools';
 import { createReachTools, type ReachWrite } from '@/lib/ai/tools';
-import { createSharedTools, SHARED_TOOL_NAMES, type SharedToolContext } from '@/lib/ai/shared-tools';
+import { createSharedTools, SHARED_TOOL_NAMES, SHARED_WRITE_TOOL_NAMES, type SharedToolContext } from '@/lib/ai/shared-tools';
 import { NOT_PREPARED, NOT_WAITING, memoryProposalStore, type ProposalStore } from '@/lib/chat/proposal-store';
 import type { HireWriteContext } from '@/lib/hire/capabilities';
 import type { CvReader } from '@/lib/hire/cv-read';
@@ -300,12 +300,12 @@ export function metaProduct(ctx: SharedToolContext): ProductToolkit {
 
 /** Shared tools available to both Jebat and Kasturi (image generation, landing page creation, etc.) */
 export function sharedProduct(ctx: SharedToolContext): ProductToolkit {
-  const tools = createSharedTools(ctx);
+  const { read, write } = split(createSharedTools(ctx), SHARED_WRITE_TOOL_NAMES);
   return {
     key: ctx.agent === 'jebat' ? 'reach' : 'crm',
     name: ctx.agent === 'jebat' ? 'Jebat' : 'Kasturi',
-    read: tools,
-    write: {},
+    read,
+    write,
   };
 }
 

@@ -118,6 +118,7 @@ const sealForWorkspace = () => {
 };
 const { CRM_WRITE_TOOL_NAMES } = await import('@/lib/ai/crm-tools');
 const { KASTURI_SHARED_TOOL_NAMES, REACH_WRITE_TOOL_NAMES } = await import('@/lib/ai/products');
+const { SHARED_TOOL_NAMES } = await import('@/lib/ai/shared-tools');
 
 const { POST } = await import('@/app/api/crm/chat/route');
 
@@ -215,8 +216,10 @@ describe('POST /api/crm/chat happy path', () => {
     expect(call.systemParts?.[0].content).not.toContain('TODAY');
     expect(call.systemParts?.[1].marked).toBe(false);
     expect(call.systemParts?.[1].content).toMatch(/^TODAY\n- It is /);
-    // Appointments and lead forms are Kasturi screens too; ads and leads are not.
-    expect(call.tools).toHaveLength(4 + 2 + 2 + CRM_WRITE_TOOL_NAMES.length + KASTURI_SHARED_TOOL_NAMES.length + DOCS_TOOL_NAMES.length);
+    // Appointments and lead forms are Kasturi screens too, and she holds the shared image/landing page tools; ads and leads are not.
+    expect(call.tools).toHaveLength(
+      4 + 2 + 2 + CRM_WRITE_TOOL_NAMES.length + KASTURI_SHARED_TOOL_NAMES.length + SHARED_TOOL_NAMES.length + DOCS_TOOL_NAMES.length,
+    );
     expect(call.tools).toEqual(expect.arrayContaining([...DOCS_TOOL_NAMES]));
     expect(call.tools).not.toContain('getCampaigns');
     expect(call.tools).not.toContain('createLead');
