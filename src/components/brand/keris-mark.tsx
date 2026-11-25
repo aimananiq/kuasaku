@@ -1,5 +1,5 @@
 /**
- * The KuasabyRickworks mark: a keris with a wavy blade, drawn on the diagonal.
+ * The KuasaIO mark: a keris with a wavy blade, drawn on the diagonal.
  * Three paths in a 24 × 24 box: blade, guard, hilt.
  */
 export const KERIS_BLADE =

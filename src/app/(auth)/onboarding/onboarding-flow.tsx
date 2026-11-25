@@ -384,7 +384,7 @@ export function OnboardingFlow({
                   </div>
                 ) : null}
                 <p className="text-sm text-muted-foreground">
-                  KuasabyRickworks is a work in progress. Some screens work with
+                  KuasaIO is a work in progress. Some screens work with
                   your own data and the rest still show sample data, so do not
                   rely on it to run your business yet.
                 </p>

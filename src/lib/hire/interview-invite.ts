@@ -177,7 +177,7 @@ export function interviewIcs(i: InviteSource, now: Date): string | null {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//OpenKuasa//Lekir//EN',
+    'PRODID:-//KuasaIO//Lekir//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',

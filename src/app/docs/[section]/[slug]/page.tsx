@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { section, slug } = await params;
   const guide = getGuide(section, slug);
   if (!guide) return {};
-  const title = `${guide.title} · KuasabyRickworks Docs`;
+  const title = `${guide.title} · KuasaIO Docs`;
   return {
     title,
     description: guide.description,

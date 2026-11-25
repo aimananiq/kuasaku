@@ -1,5 +1,5 @@
 /**
- * Official fal.ai integration seam for OpenKuasa.
+ * Official fal.ai integration seam for KuasaIO.
  *
  * Implements:
  * - API key resolution (Database encrypted org_ai_keys -> env var fallback)

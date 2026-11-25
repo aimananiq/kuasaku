@@ -37,8 +37,8 @@ export function AccountShell({
           >
             <Menu className="size-5" />
           </button>
-          <Link href="/command" aria-label="KuasabyRickworks home">
-            <Logo wordmark="KuasabyRickworks" wordmarkClassName="whitespace-nowrap max-sm:hidden" />
+          <Link href="/command" aria-label="KuasaIO home">
+            <Logo wordmark="KuasaIO" wordmarkClassName="whitespace-nowrap max-sm:hidden" />
           </Link>
           <span className="hidden text-muted-foreground sm:inline">·</span>
           <span className="hidden font-semibold text-muted-foreground sm:inline">

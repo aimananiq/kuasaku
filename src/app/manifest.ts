@@ -1,14 +1,14 @@
 import type { MetadataRoute } from 'next';
 
 /**
- * Makes KuasabyRickworks installable from the website: its own icon and window on phones and laptops.
+ * Makes KuasaIO installable from the website: its own icon and window on phones and laptops.
  * The icons are listed in src/proxy.ts so they load without the session check.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: '/',
-    name: 'KuasabyRickworks',
-    short_name: 'KuasabyRickworks',
+    name: 'KuasaIO',
+    short_name: 'KuasaIO',
     description: 'The community-built, open-source operating system for your business.',
     start_url: '/command',
     scope: '/',

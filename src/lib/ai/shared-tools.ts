@@ -587,7 +587,7 @@ export function createSharedTools(ctx: SharedToolContext): ToolSet {
 
     save_landing_page: tool({
       description:
-        'Save landing page as draft or published in OpenKuasa database. Associates hero visual, content, and lead form.',
+        'Save landing page as draft or published in KuasaIO database. Associates hero visual, content, and lead form.',
       inputSchema: saveLandingPageInputSchema,
       execute: async (input) => {
         verifyPermission('save_landing_page');
@@ -657,7 +657,7 @@ export function createSharedTools(ctx: SharedToolContext): ToolSet {
     }),
 
     create_lead_form: tool({
-      description: 'Create a lead capture form in OpenKuasa that connects visitor submissions to Kasturi CRM.',
+      description: 'Create a lead capture form in KuasaIO that connects visitor submissions to Kasturi CRM.',
       inputSchema: createLeadFormInputSchema,
       execute: async (input) => {
         verifyPermission('create_lead_form');

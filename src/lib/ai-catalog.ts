@@ -3,14 +3,14 @@
 // would carry an `identifier` URN, `displayName`, `type` (IANA media type) and one of
 // `url`/`data`.
 //
-// KuasabyRickworks advertises no public agentic resources yet — Taming Sari AI is a
+// KuasaIO advertises no public agentic resources yet — Taming Sari AI is a
 // per-workspace, authenticated assistant, not a public MCP server or A2A agent — so
 // `entries` is intentionally empty. This valid manifest clears the "malformed JSON /
 // invalid schema" audit; add entries once a public resource exists.
 export const AI_CATALOG = {
   specVersion: '1.0',
   host: {
-    displayName: 'KuasabyRickworks',
+    displayName: 'KuasaIO',
     identifier: 'did:web:openkuasa.com',
   },
   entries: [] as unknown[],
